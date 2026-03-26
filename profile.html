@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gymix — Профиль</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --purple: #6C5CE7;
+      --purple-dark: #5849c4;
+      --purple-light: #a29bfe;
+      --white: #ffffff;
+      --off-white: #f4f5fb;
+      --dark: #111118;
+      --gray: #888899;
+      --gray-light: #eef0f8;
+      --radius: 20px;
+      --radius-lg: 28px;
+      --orange: #ff9f43;
+      --green: #26c75a;
+      --red: #ff4757;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Noto Sans', sans-serif; background: var(--off-white); color: var(--dark); min-height: 100vh; }
+
+    /* HEADER */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      height: 56px; display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px;
+      background: rgba(255,255,255,0.96); backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+    .logo { display: flex; align-items: center; text-decoration: none; }
+    .logo img { height: 34px; object-fit: contain; }
+    nav { display: flex; align-items: center; gap: 4px; position: absolute; left: 50%; transform: translateX(-50%); }
+    nav a { padding: 6px 14px; border-radius: 50px; text-decoration: none; font-size: 13.5px; font-weight: 500; color: #333; transition: all 0.18s; white-space: nowrap; }
+    nav a:hover { background: var(--off-white); color: var(--purple); }
+    nav a.active { color: var(--purple); font-weight: 600; }
+    .header-right { display: flex; align-items: center; gap: 10px; }
+    .btn-logout {
+      padding: 8px 20px; border-radius: 50px; border: 1.5px solid #ddd; background: transparent;
+      color: var(--gray); font-family: 'Noto Sans', sans-serif; font-size: 13px; font-weight: 600;
+      cursor: pointer; text-decoration: none; transition: all 0.2s;
+    }
+    .btn-logout:hover { border-color: var(--red); color: var(--red); }
+
+    /* MAIN */
+    .page { padding: 80px 40px 60px; max-width: 900px; margin: 0 auto; }
+
+    /* NOT LOGGED IN */
+    .not-logged {
+      text-align: center; padding: 80px 20px;
+    }
+    .not-logged .icon { font-size: 64px; margin-bottom: 20px; }
+    .not-logged h2 { font-family: 'Montserrat', sans-serif; font-size: 24px; font-weight: 800; margin-bottom: 12px; }
+    .not-logged p { color: var(--gray); margin-bottom: 28px; }
+    .btn-go {
+      display: inline-block; padding: 14px 36px; border-radius: 50px;
+      background: var(--purple); color: white; text-decoration: none;
+      font-weight: 700; font-size: 15px; transition: all 0.2s;
+    }
+    .btn-go:hover { background: var(--purple-dark); transform: translateY(-2px); }
+
+    /* PROFILE CARD */
+    .profile-card {
+      background: white; border-radius: var(--radius-lg); padding: 32px;
+      display: flex; align-items: center; gap: 28px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 24px rgba(108,92,231,0.07);
+    }
+    .avatar-wrap { position: relative; flex-shrink: 0; }
+    .avatar {
+      width: 88px; height: 88px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--purple), var(--purple-light));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px; color: white; font-weight: 700;
+      overflow: hidden; cursor: pointer;
+    }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .avatar-edit {
+      position: absolute; bottom: 0; right: 0;
+      width: 26px; height: 26px; border-radius: 50%;
+      background: var(--purple); color: white;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; border: 2px solid white;
+    }
+    .profile-info { flex: 1; }
+    .profile-name { font-family: 'Montserrat', sans-serif; font-size: 22px; font-weight: 800; margin-bottom: 4px; }
+    .profile-email { font-size: 13.5px; color: var(--gray); margin-bottom: 12px; }
+    .profile-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--off-white); border-radius: 50px; padding: 5px 14px;
+      font-size: 12.5px; font-weight: 600; color: var(--purple);
+    }
+    .profile-actions { display: flex; gap: 12px; flex-shrink: 0; }
+
+    /* ACTION BUTTONS */
+    .btn-action {
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      padding: 16px 24px; border-radius: var(--radius);
+      background: var(--off-white); border: none; cursor: pointer;
+      transition: all 0.2s; text-decoration: none; color: var(--dark);
+      min-width: 110px;
+    }
+    .btn-action:hover { background: var(--purple); color: white; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(108,92,231,0.25); }
+    .btn-action:hover .action-icon { color: white; }
+    .action-icon { font-size: 24px; }
+    .action-label { font-size: 12px; font-weight: 600; text-align: center; }
+
+    /* STATS ROW */
+    .stats-row {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: white; border-radius: var(--radius); padding: 24px;
+      text-align: center; box-shadow: 0 4px 24px rgba(108,92,231,0.07);
+    }
+    .stat-num {
+      font-family: 'Montserrat', sans-serif; font-size: 36px; font-weight: 900;
+      color: var(--purple); margin-bottom: 4px;
+    }
+    .stat-label { font-size: 12.5px; color: var(--gray); font-weight: 600; }
+
+    /* PANELS */
+    .panel {
+      background: white; border-radius: var(--radius-lg); padding: 28px;
+      margin-bottom: 20px; box-shadow: 0 4px 24px rgba(108,92,231,0.07);
+      display: none;
+    }
+    .panel.active { display: block; }
+    .panel-title {
+      font-family: 'Montserrat', sans-serif; font-size: 18px; font-weight: 800;
+      margin-bottom: 24px; display: flex; align-items: center; gap: 10px;
+    }
+
+    /* RATING / CALENDAR */
+    .rating-header {
+      display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;
+    }
+    .rating-badge {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--off-white); border-radius: var(--radius); padding: 14px 20px; flex: 1;
+    }
+    .rating-badge-icon { font-size: 28px; }
+    .rating-badge-info {}
+    .rating-badge-num { font-family: 'Montserrat', sans-serif; font-size: 22px; font-weight: 800; }
+    .rating-badge-label { font-size: 12px; color: var(--gray); }
+
+    /* CALENDAR */
+    .calendar-wrap { overflow-x: auto; }
+    .calendar-months { display: flex; gap: 20px; min-width: max-content; }
+    .cal-month {}
+    .cal-month-name {
+      font-size: 12px; font-weight: 700; color: var(--gray);
+      text-transform: uppercase; letter-spacing: 0.08em;
+      margin-bottom: 10px;
+    }
+    .cal-days {
+      display: grid; grid-template-columns: repeat(7, 28px); gap: 4px;
+    }
+    .cal-day {
+      width: 28px; height: 28px; border-radius: 8px;
+      background: var(--gray-light); display: flex; align-items: center;
+      justify-content: center; font-size: 10px; color: var(--gray);
+      cursor: default; transition: all 0.15s;
+    }
+    .cal-day.visited {
+      background: var(--purple); color: white; font-weight: 700;
+    }
+    .cal-day.today {
+      border: 2px solid var(--purple); color: var(--purple); font-weight: 700;
+      background: white;
+    }
+    .cal-day.visited.today { border: 2px solid var(--purple-dark); background: var(--purple); color: white; }
+    .cal-day.empty { background: transparent; }
+    .cal-day:hover:not(.empty) { opacity: 0.8; }
+
+    /* Streak badges */
+    .streaks { display: flex; gap: 8px; margin-top: 20px; flex-wrap: wrap; }
+    .streak-badge {
+      display: flex; align-items: center; gap: 6px;
+      background: linear-gradient(135deg, #ff9f43, #ff6b35);
+      color: white; border-radius: 50px; padding: 6px 14px;
+      font-size: 12.5px; font-weight: 700;
+    }
+    .streak-badge.cold { background: linear-gradient(135deg, #a29bfe, #6C5CE7); }
+    .add-visit-btn {
+      margin-top: 20px; padding: 12px 28px; border-radius: 50px;
+      background: var(--purple); color: white; border: none;
+      font-family: 'Noto Sans', sans-serif; font-size: 14px; font-weight: 700;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .add-visit-btn:hover { background: var(--purple-dark); transform: translateY(-1px); }
+
+    /* SETTINGS FORM */
+    .settings-form { display: flex; flex-direction: column; gap: 16px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-group { display: flex; flex-direction: column; gap: 8px; }
+    .form-group label { font-size: 13px; font-weight: 600; }
+    .form-group input, .form-group select {
+      padding: 13px 16px; border-radius: 14px; border: 1.5px solid #e0e0e8;
+      font-family: 'Noto Sans', sans-serif; font-size: 14px; color: var(--dark);
+      background: var(--off-white); outline: none; transition: all 0.2s;
+    }
+    .form-group input:focus, .form-group select:focus {
+      border-color: var(--purple); box-shadow: 0 0 0 3px rgba(108,92,231,0.12); background: white;
+    }
+    .settings-divider { height: 1px; background: var(--gray-light); margin: 8px 0; }
+    .settings-section-title { font-size: 12px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: -4px; }
+    .btn-save {
+      padding: 13px 32px; border-radius: 50px; background: var(--purple);
+      color: white; border: none; font-family: 'Noto Sans', sans-serif;
+      font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+      align-self: flex-start;
+    }
+    .btn-save:hover { background: var(--purple-dark); transform: translateY(-1px); }
+    .save-success { color: var(--green); font-size: 13px; font-weight: 600; display: none; align-items: center; gap: 6px; }
+    .save-success.show { display: flex; }
+
+    /* SUBSCRIPTION CARD */
+    .sub-card {
+      background: linear-gradient(135deg, #6C5CE7, #a29bfe);
+      border-radius: var(--radius-lg); padding: 28px; color: white; margin-bottom: 20px;
+      box-shadow: 0 8px 32px rgba(108,92,231,0.25);
+    }
+    .sub-card-label { font-size: 12px; opacity: 0.75; margin-bottom: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
+    .sub-card-name { font-family: 'Montserrat', sans-serif; font-size: 26px; font-weight: 800; margin-bottom: 4px; }
+    .sub-card-dates { font-size: 13px; opacity: 0.8; margin-bottom: 20px; }
+    .sub-card-bottom { display: flex; justify-content: space-between; align-items: flex-end; }
+    .sub-card-days { font-size: 13px; opacity: 0.75; }
+    .sub-card-days span { font-family: 'Montserrat', sans-serif; font-size: 28px; font-weight: 800; display: block; opacity: 1; }
+    .no-sub { text-align: center; padding: 32px; color: var(--gray); }
+    .no-sub .icon { font-size: 48px; margin-bottom: 12px; }
+    .no-sub p { margin-bottom: 16px; }
+
+    @media(max-width:768px) {
+      header { padding: 0 16px; } nav { display: none; }
+      .page { padding: 72px 16px 40px; }
+      .profile-card { flex-direction: column; text-align: center; }
+      .profile-actions { justify-content: center; }
+      .stats-row { grid-template-columns: repeat(3,1fr); gap: 10px; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="logo">
+    <img src="images/logo/gymix-logo.png" alt="Gymix">
+  </a>
+  <nav>
+    <a href="index.html">Басты бет</a>
+    <a href="search.html">Барлық залдар</a>
+    <a href="subscription.html">Абонемент</a>
+    <a href="extra.html">Extra</a>
+    <a href="profile.html" class="active">Профиль</a>
+    <a href="about.html">Біз туралы</a>
+  </nav>
+  <div class="header-right">
+    <button class="btn-logout" onclick="logout()">Шығу</button>
+  </div>
+</header>
+
+<div class="page" id="mainContent">
+  <!-- JS толтырады -->
+</div>
+
+<script>
+  // ══════════════════════════════════
+  // SESSION & DATA
+  // ══════════════════════════════════
+  function getSession() { return JSON.parse(localStorage.getItem('gymix_session') || 'null'); }
+  function getUsers()   { return JSON.parse(localStorage.getItem('gymix_users')   || '[]'); }
+  function saveUsers(u) { localStorage.setItem('gymix_users', JSON.stringify(u)); }
+
+  function getCurrentUser() {
+    const s = getSession();
+    if (!s) return null;
+    return getUsers().find(u => u.id === s.id) || null;
+  }
+
+  function updateUser(updated) {
+    const users = getUsers();
+    const idx = users.findIndex(u => u.id === updated.id);
+    if (idx !== -1) { users[idx] = updated; saveUsers(users); }
+    // сессияны да жаңарту
+    localStorage.setItem('gymix_session', JSON.stringify({
+      id: updated.id, name: updated.name, email: updated.email,
+      avatar: updated.avatar || '', loggedIn: true, loginTime: Date.now()
+    }));
+  }
+
+  function logout() {
+    localStorage.removeItem('gymix_session');
+    window.location.href = 'pages/login.html';
+  }
+
+  // ══════════════════════════════════
+  // RENDER
+  // ══════════════════════════════════
+  window.addEventListener('DOMContentLoaded', () => {
+    const user = getCurrentUser();
+    const content = document.getElementById('mainContent');
+
+    if (!user) {
+      content.innerHTML = `
+        <div class="not-logged">
+          <div class="icon">🔒</div>
+          <h2>Кіру қажет</h2>
+          <p>Профильді көру үшін аккаунтыңызға кіріңіз</p>
+          <a href="pages/login.html" class="btn-go">Кіру / Тіркелу</a>
+        </div>`;
+      return;
+    }
+
+    const visits = user.visits || [];
+    const totalVisits = visits.length;
+    const currentStreak = calcStreak(visits);
+    const activeWeeks = calcActiveWeeks(visits);
+    const initials = user.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+    const sub = user.subscription;
+
+    content.innerHTML = `
+      <!-- PROFILE CARD -->
+      <div class="profile-card">
+        <div class="avatar-wrap">
+          <div class="avatar" id="avatarEl" onclick="document.getElementById('avatarInput').click()">
+            ${user.avatar
+              ? `<img src="${user.avatar}" alt="avatar">`
+              : initials}
+          </div>
+          <div class="avatar-edit" onclick="document.getElementById('avatarInput').click()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </div>
+          <input type="file" id="avatarInput" accept="image/*" style="display:none" onchange="changeAvatar(event)">
+        </div>
+        <div class="profile-info">
+          <div class="profile-name">${user.name}</div>
+          <div class="profile-email">${user.email}</div>
+          <div class="profile-badge">🏅 Gymix мүшесі</div>
+        </div>
+        <div class="profile-actions">
+          <button class="btn-action" onclick="showPanel('rating')">
+            <span class="action-icon">🏆</span>
+            <span class="action-label">Менің рейтингім</span>
+          </button>
+          <button class="btn-action" onclick="showPanel('settings')">
+            <span class="action-icon">⚙️</span>
+            <span class="action-label">Баптаулар</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- SUBSCRIPTION CARD -->
+      ${sub ? `
+        <div class="sub-card">
+          <div class="sub-card-label">Ағымдағы абонемент</div>
+          <div class="sub-card-name">${sub.name}</div>
+          <div class="sub-card-dates">${sub.start} — ${sub.end}</div>
+          <div class="sub-card-bottom">
+            <div style="opacity:0.8;font-size:13px;">✅ Белсенді</div>
+            <div class="sub-card-days">
+              <span>${sub.daysLeft}</span>
+              күн қалды
+            </div>
+          </div>
+        </div>
+      ` : `
+        <div class="sub-card" style="background:linear-gradient(135deg,#888,#aaa);">
+          <div class="no-sub">
+            <div class="icon">🎫</div>
+            <p style="color:white;opacity:0.85">Абонементіңіз жоқ</p>
+            <a href="subscription.html" class="btn-go" style="background:white;color:#6C5CE7;">Абонемент алу</a>
+          </div>
+        </div>
+      `}
+
+      <!-- STATS -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-num">${totalVisits}</div>
+          <div class="stat-label">Барлық визит</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">${currentStreak} 🔥</div>
+          <div class="stat-label">Ағымдағы страйк (апта)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">${activeWeeks}</div>
+          <div class="stat-label">Белсенді апта</div>
+        </div>
+      </div>
+
+      <!-- RATING PANEL -->
+      <div class="panel" id="panel-rating">
+        <div class="panel-title">🏆 Менің рейтингім</div>
+
+        <div class="rating-header">
+          <div class="rating-badge">
+            <div class="rating-badge-icon">🏃</div>
+            <div class="rating-badge-info">
+              <div class="rating-badge-num">${totalVisits}</div>
+              <div class="rating-badge-label">Барлық визит</div>
+            </div>
+          </div>
+          <div class="rating-badge">
+            <div class="rating-badge-icon">🔥</div>
+            <div class="rating-badge-info">
+              <div class="rating-badge-num">${currentStreak}</div>
+              <div class="rating-badge-label">Апталық страйк</div>
+            </div>
+          </div>
+          <div class="rating-badge">
+            <div class="rating-badge-icon">⚡</div>
+            <div class="rating-badge-info">
+              <div class="rating-badge-num">${activeWeeks}</div>
+              <div class="rating-badge-label">Белсенді апта</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="font-weight:700;margin-bottom:12px;font-size:14px;">Соңғы 3 ай</div>
+        <div class="calendar-wrap">
+          <div class="calendar-months" id="calendarEl"></div>
+        </div>
+
+        <div class="streaks" id="streaksEl"></div>
+
+        <button class="add-visit-btn" onclick="addVisitToday()">+ Бүгін залға бардым</button>
+      </div>
+
+      <!-- SETTINGS PANEL -->
+      <div class="panel" id="panel-settings">
+        <div class="panel-title">⚙️ Баптаулар</div>
+        <div class="settings-form">
+          <div class="settings-section-title">Жеке ақпарат</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Аты-жөні</label>
+              <input type="text" id="sName" value="${user.name}">
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" id="sEmail" value="${user.email}">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Телефон</label>
+              <input type="tel" id="sPhone" value="${user.phone || ''}" placeholder="+7 (777) 123-45-67">
+            </div>
+            <div class="form-group">
+              <label>Қала</label>
+              <select id="sCity">
+                <option ${(user.city||'Астана')==='Астана'?'selected':''}>Астана</option>
+                <option ${user.city==='Алматы'?'selected':''}>Алматы</option>
+                <option ${user.city==='Шымкент'?'selected':''}>Шымкент</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="settings-divider"></div>
+          <div class="settings-section-title">Құпия сөзді өзгерту</div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Жаңа құпия сөз</label>
+              <input type="password" id="sPass" placeholder="Кемінде 6 таңба">
+            </div>
+            <div class="form-group">
+              <label>Растау</label>
+              <input type="password" id="sPass2" placeholder="Қайта енгізіңіз">
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+            <button class="btn-save" onclick="saveSettings()">Сақтау</button>
+            <div class="save-success" id="saveSuccess">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Сақталды!
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    buildCalendar(visits);
+    buildStreaks(currentStreak, activeWeeks);
+  });
+
+  // ══════════════════════════════════
+  // PANELS
+  // ══════════════════════════════════
+  function showPanel(name) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    const el = document.getElementById('panel-' + name);
+    if (el) {
+      el.classList.add('active');
+      setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+    }
+  }
+
+  // ══════════════════════════════════
+  // CALENDAR
+  // ══════════════════════════════════
+  function buildCalendar(visits) {
+    const el = document.getElementById('calendarEl');
+    if (!el) return;
+
+    const visitSet = new Set(visits.map(v => v.slice(0,10)));
+    const today = new Date();
+    const months = [];
+
+    for (let m = 2; m >= 0; m--) {
+      const d = new Date(today.getFullYear(), today.getMonth() - m, 1);
+      months.push(d);
+    }
+
+    const monthNames = ['Қаң','Ақп','Нау','Сәу','Мам','Мау','Шіл','Там','Қыр','Қаз','Қар','Жел'];
+
+    el.innerHTML = months.map(monthDate => {
+      const year = monthDate.getFullYear();
+      const month = monthDate.getMonth();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const firstDay = (new Date(year, month, 1).getDay() + 6) % 7; // Дүйсенбіден бастау
+
+      let days = '';
+      // Бос ұяшықтар
+      for (let i = 0; i < firstDay; i++) {
+        days += `<div class="cal-day empty"></div>`;
+      }
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        const isVisited = visitSet.has(dateStr);
+        const isToday = dateStr === today.toISOString().slice(0,10);
+        const cls = ['cal-day', isVisited ? 'visited' : '', isToday ? 'today' : ''].filter(Boolean).join(' ');
+        days += `<div class="${cls}" title="${dateStr}">${d}</div>`;
+      }
+
+      return `
+        <div class="cal-month">
+          <div class="cal-month-name">${monthNames[month]} ${year}</div>
+          <div class="cal-days">${days}</div>
+        </div>`;
+    }).join('');
+  }
+
+  // ══════════════════════════════════
+  // STREAK CALCULATION
+  // ══════════════════════════════════
+  function calcStreak(visits) {
+    if (!visits.length) return 0;
+    // Апта бойынша топтастыру
+    const weeks = new Set();
+    visits.forEach(v => {
+      const d = new Date(v);
+      const week = getWeekKey(d);
+      weeks.add(week);
+    });
+
+    const today = new Date();
+    let streak = 0;
+    let weekDate = new Date(today);
+
+    while (true) {
+      const key = getWeekKey(weekDate);
+      if (weeks.has(key)) {
+        streak++;
+        weekDate.setDate(weekDate.getDate() - 7);
+      } else break;
+    }
+    return streak;
+  }
+
+  function calcActiveWeeks(visits) {
+    const weeks = new Set();
+    visits.forEach(v => weeks.add(getWeekKey(new Date(v))));
+    return weeks.size;
+  }
+
+  function getWeekKey(d) {
+    const tmp = new Date(d);
+    tmp.setHours(0,0,0,0);
+    tmp.setDate(tmp.getDate() - (tmp.getDay() + 6) % 7);
+    return tmp.toISOString().slice(0,10);
+  }
+
+  // ══════════════════════════════════
+  // STREAKS BADGES
+  // ══════════════════════════════════
+  function buildStreaks(streak, activeWeeks) {
+    const el = document.getElementById('streaksEl');
+    if (!el) return;
+    const badges = [];
+    if (streak >= 1) badges.push(`<div class="streak-badge">🔥 ${streak} апталық страйк</div>`);
+    if (activeWeeks >= 4) badges.push(`<div class="streak-badge cold">⚡ ${activeWeeks} белсенді апта</div>`);
+    if (streak >= 4) badges.push(`<div class="streak-badge">🏆 Ай бойы үздіксіз!</div>`);
+    el.innerHTML = badges.join('') || '<div style="color:var(--gray);font-size:13px;">Залға барған сайын страйк жинайсыз! 💪</div>';
+  }
+
+  // ══════════════════════════════════
+  // ADD VISIT
+  // ══════════════════════════════════
+  function addVisitToday() {
+    const user = getCurrentUser();
+    if (!user) return;
+
+    const today = new Date().toISOString().slice(0,10);
+    if (!user.visits) user.visits = [];
+
+    if (user.visits.includes(today)) {
+      alert('Бүгін бұрыннан белгіленген! ✅');
+      return;
+    }
+
+    user.visits.push(today);
+    updateUser(user);
+    location.reload();
+  }
+
+  // ══════════════════════════════════
+  // AVATAR CHANGE
+  // ══════════════════════════════════
+  function changeAvatar(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const user = getCurrentUser();
+      if (!user) return;
+      user.avatar = ev.target.result;
+      updateUser(user);
+      location.reload();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // ══════════════════════════════════
+  // SAVE SETTINGS
+  // ══════════════════════════════════
+  function saveSettings() {
+    const user = getCurrentUser();
+    if (!user) return;
+
+    user.name  = document.getElementById('sName').value.trim() || user.name;
+    user.email = document.getElementById('sEmail').value.trim() || user.email;
+    user.phone = document.getElementById('sPhone').value.trim();
+    user.city  = document.getElementById('sCity').value;
+
+    const newPass  = document.getElementById('sPass').value;
+    const newPass2 = document.getElementById('sPass2').value;
+
+    if (newPass) {
+      if (newPass.length < 6) { alert('Құпия сөз кемінде 6 таңба болуы керек'); return; }
+      if (newPass !== newPass2) { alert('Құпия сөздер сәйкес келмейді'); return; }
+      user.password = btoa(newPass);
+    }
+
+    updateUser(user);
+
+    const ok = document.getElementById('saveSuccess');
+    ok.classList.add('show');
+    setTimeout(() => ok.classList.remove('show'), 2500);
+
+    // Аты өзгерсе — профиль картасын жаңарту
+    document.querySelector('.profile-name').textContent = user.name;
+  }
+</script>
+
+</body>
+</html>

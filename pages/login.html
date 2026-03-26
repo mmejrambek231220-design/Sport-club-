@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gymix — Кіру / Тіркелу</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --purple: #6C5CE7;
+      --purple-dark: #5849c4;
+      --purple-light: #a29bfe;
+      --white: #ffffff;
+      --off-white: #f4f5fb;
+      --dark: #111118;
+      --gray: #888899;
+      --gray-light: #eef0f8;
+      --radius: 20px;
+      --red: #ff4757;
+      --green: #26c75a;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Noto Sans', sans-serif;
+      background: var(--off-white);
+      color: var(--dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* HEADER */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      height: 56px; display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px;
+      background: rgba(255,255,255,0.96); backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+    .logo { display: flex; align-items: center; text-decoration: none; }
+    .logo img { height: 34px; object-fit: contain; }
+    .back-link {
+      color: var(--gray); text-decoration: none; font-size: 13.5px;
+      font-weight: 500; display: flex; align-items: center; gap: 6px;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--purple); }
+
+    /* MAIN LAYOUT */
+    .auth-page {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 20px 40px;
+      min-height: 100vh;
+    }
+
+    .auth-box {
+      background: white;
+      border-radius: 28px;
+      padding: 48px 44px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 8px 48px rgba(108,92,231,0.10);
+      animation: fadeUp 0.5s ease both;
+    }
+
+    /* Logo inside box */
+    .auth-logo {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .auth-logo img { height: 36px; object-fit: contain; }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      background: var(--off-white);
+      border-radius: 50px;
+      padding: 4px;
+      margin-bottom: 32px;
+    }
+    .tab {
+      flex: 1; text-align: center;
+      padding: 10px;
+      border-radius: 50px;
+      font-family: 'Noto Sans', sans-serif;
+      font-size: 14px; font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s;
+      color: var(--gray);
+      border: none; background: transparent;
+    }
+    .tab.active {
+      background: white;
+      color: var(--dark);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+
+    /* Forms */
+    .form-panel { display: none; }
+    .form-panel.active { display: block; }
+
+    .form-group { margin-bottom: 16px; }
+    .form-group label {
+      display: block;
+      font-size: 13px; font-weight: 600;
+      color: var(--dark);
+      margin-bottom: 8px;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1.5px solid #e0e0e8;
+      font-family: 'Noto Sans', sans-serif;
+      font-size: 14px;
+      color: var(--dark);
+      background: var(--off-white);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-group input:focus {
+      border-color: var(--purple);
+      box-shadow: 0 0 0 3px rgba(108,92,231,0.12);
+      background: white;
+    }
+    .form-group input.error { border-color: var(--red); }
+    .form-group input.success { border-color: var(--green); }
+
+    /* Password wrapper */
+    .input-wrap { position: relative; }
+    .toggle-pass {
+      position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer;
+      color: var(--gray); padding: 4px; transition: color 0.2s;
+    }
+    .toggle-pass:hover { color: var(--purple); }
+
+    /* Error message */
+    .field-error {
+      font-size: 12px; color: var(--red);
+      margin-top: 5px; display: none;
+    }
+    .field-error.show { display: block; }
+
+    /* Submit button */
+    .btn-submit {
+      width: 100%;
+      padding: 15px;
+      border-radius: 50px;
+      border: none;
+      background: var(--purple);
+      color: white;
+      font-family: 'Noto Sans', sans-serif;
+      font-size: 15px; font-weight: 700;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: all 0.25s;
+      box-shadow: 0 6px 24px rgba(108,92,231,0.3);
+    }
+    .btn-submit:hover { background: var(--purple-dark); transform: translateY(-2px); box-shadow: 0 10px 32px rgba(108,92,231,0.4); }
+    .btn-submit:active { transform: translateY(0); }
+    .btn-submit:disabled { background: var(--gray); box-shadow: none; cursor: not-allowed; transform: none; }
+
+    /* Alert */
+    .alert {
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 13.5px;
+      margin-bottom: 16px;
+      display: none;
+      align-items: center;
+      gap: 10px;
+    }
+    .alert.show { display: flex; }
+    .alert.error { background: #fff0f0; color: var(--red); border: 1px solid #ffd0d0; }
+    .alert.success { background: #f0fff5; color: #1a9648; border: 1px solid #b8f0ce; }
+
+    /* Divider */
+    .divider {
+      display: flex; align-items: center; gap: 12px;
+      margin: 20px 0; color: var(--gray); font-size: 12px;
+    }
+    .divider::before, .divider::after {
+      content: ''; flex: 1; height: 1px; background: #e0e0e8;
+    }
+
+    /* Switch link */
+    .switch-text {
+      text-align: center; font-size: 13px; color: var(--gray); margin-top: 20px;
+    }
+    .switch-text a {
+      color: var(--purple); font-weight: 600; text-decoration: none;
+      cursor: pointer;
+    }
+    .switch-text a:hover { text-decoration: underline; }
+
+    /* Checkbox */
+    .checkbox-wrap {
+      display: flex; align-items: flex-start; gap: 10px;
+      margin-bottom: 20px;
+    }
+    .checkbox-wrap input[type="checkbox"] {
+      width: 18px; height: 18px; flex-shrink: 0;
+      accent-color: var(--purple); cursor: pointer; margin-top: 1px;
+    }
+    .checkbox-wrap label {
+      font-size: 12.5px; color: var(--gray); cursor: pointer; line-height: 1.5;
+    }
+    .checkbox-wrap label a { color: var(--purple); text-decoration: none; }
+
+    /* Success state */
+    .success-box {
+      text-align: center; padding: 20px 0; display: none;
+    }
+    .success-box .icon { font-size: 56px; margin-bottom: 16px; }
+    .success-box h3 {
+      font-family: 'Montserrat', sans-serif; font-size: 20px; font-weight: 800;
+      margin-bottom: 8px;
+    }
+    .success-box p { font-size: 14px; color: var(--gray); margin-bottom: 24px; }
+
+    /* Loading spinner */
+    .spinner {
+      display: inline-block; width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: white; border-radius: 50%;
+      animation: spin 0.7s linear infinite; vertical-align: middle;
+      margin-right: 6px; display: none;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <a href="../index.html" class="logo">
+    <img src="../images/logo/gymix-logo.png" alt="Gymix">
+  </a>
+  <a href="../index.html" class="back-link">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Басты бетке оралу
+  </a>
+</header>
+
+<!-- AUTH PAGE -->
+<div class="auth-page">
+  <div class="auth-box">
+
+    <div class="auth-logo">
+      <img src="../images/logo/gymix-logo.png" alt="Gymix">
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('login')">Кіру</button>
+      <button class="tab" onclick="switchTab('register')">Тіркелу</button>
+    </div>
+
+    <!-- ALERT -->
+    <div class="alert error" id="alertBox">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span id="alertText"></span>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div class="form-panel active" id="loginPanel">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="loginEmail" placeholder="email@example.com" autocomplete="email">
+        <div class="field-error" id="loginEmailErr">Дұрыс email енгізіңіз</div>
+      </div>
+      <div class="form-group">
+        <label>Құпия сөз</label>
+        <div class="input-wrap">
+          <input type="password" id="loginPass" placeholder="Құпия сөзіңіз" autocomplete="current-password">
+          <button class="toggle-pass" onclick="togglePass('loginPass', this)" type="button">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <div class="field-error" id="loginPassErr">Құпия сөз енгізіңіз</div>
+      </div>
+      <button class="btn-submit" onclick="handleLogin()">
+        <span class="spinner" id="loginSpinner"></span>
+        Кіру
+      </button>
+      <div class="switch-text">
+        Аккаунт жоқ па? <a onclick="switchTab('register')">Тіркелу</a>
+      </div>
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div class="form-panel" id="registerPanel">
+      <div class="form-group">
+        <label>Аты-жөні</label>
+        <input type="text" id="regName" placeholder="Аты-жөніңіз" autocomplete="name">
+        <div class="field-error" id="regNameErr">Атыңызды енгізіңіз</div>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="regEmail" placeholder="email@example.com" autocomplete="email">
+        <div class="field-error" id="regEmailErr">Дұрыс email енгізіңіз</div>
+      </div>
+      <div class="form-group">
+        <label>Құпия сөз</label>
+        <div class="input-wrap">
+          <input type="password" id="regPass" placeholder="Кемінде 6 таңба" autocomplete="new-password">
+          <button class="toggle-pass" onclick="togglePass('regPass', this)" type="button">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <div class="field-error" id="regPassErr">Құпия сөз кемінде 6 таңба болуы керек</div>
+      </div>
+      <div class="form-group">
+        <label>Құпия сөзді растау</label>
+        <div class="input-wrap">
+          <input type="password" id="regPass2" placeholder="Қайта енгізіңіз" autocomplete="new-password">
+          <button class="toggle-pass" onclick="togglePass('regPass2', this)" type="button">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <div class="field-error" id="regPass2Err">Құпия сөздер сәйкес келмейді</div>
+      </div>
+      <div class="checkbox-wrap">
+        <input type="checkbox" id="agreeCheck">
+        <label for="agreeCheck">Мен <a href="#">пайдалану шарттарымен</a> және <a href="#">құпиялылық саясатымен</a> келісемін</label>
+      </div>
+      <button class="btn-submit" onclick="handleRegister()">
+        <span class="spinner" id="regSpinner"></span>
+        Тіркелу
+      </button>
+      <div class="switch-text">
+        Аккаунт бар ма? <a onclick="switchTab('login')">Кіру</a>
+      </div>
+    </div>
+
+    <!-- SUCCESS STATE -->
+    <div class="success-box" id="successBox">
+      <div class="icon">🎉</div>
+      <h3 id="successTitle">Сәтті кірдіңіз!</h3>
+      <p id="successText">Gymix-ке қош келдіңіз!</p>
+      <button class="btn-submit" onclick="goToProfile()">Профильге өту</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ═══════════════════════════════════════
+  // localStorage-дегі пайдаланушылар базасы
+  // ═══════════════════════════════════════
+
+  // Барлық тіркелген пайдаланушыларды алу
+  function getUsers() {
+    return JSON.parse(localStorage.getItem('gymix_users') || '[]');
+  }
+
+  // Пайдаланушыларды сақтау
+  function saveUsers(users) {
+    localStorage.setItem('gymix_users', JSON.stringify(users));
+  }
+
+  // Ағымдағы сессияны сақтау
+  function saveSession(user) {
+    localStorage.setItem('gymix_session', JSON.stringify({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      avatar: user.avatar || '',
+      loggedIn: true,
+      loginTime: Date.now()
+    }));
+  }
+
+  // Сессияны тексеру — кірген бе?
+  function getSession() {
+    return JSON.parse(localStorage.getItem('gymix_session') || 'null');
+  }
+
+  // Бет жүктелгенде — кірген болса профильге бағыттау
+  window.addEventListener('DOMContentLoaded', () => {
+    const session = getSession();
+    if (session && session.loggedIn) {
+      // Кірген адам login бетіне кіргісі келсе профильге жіберу
+      showAlert('Сіз бұрыннан кірген болатыңыз! Профильге өтіңіз.', 'success');
+    }
+  });
+
+  // ═══════════════════════════════════════
+  // TAB SWITCHING
+  // ═══════════════════════════════════════
+  function switchTab(tab) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('active'));
+    hideAlert();
+
+    if (tab === 'login') {
+      document.querySelectorAll('.tab')[0].classList.add('active');
+      document.getElementById('loginPanel').classList.add('active');
+    } else {
+      document.querySelectorAll('.tab')[1].classList.add('active');
+      document.getElementById('registerPanel').classList.add('active');
+    }
+  }
+
+  // ═══════════════════════════════════════
+  // VALIDATION
+  // ═══════════════════════════════════════
+  function showFieldError(id, show) {
+    const el = document.getElementById(id);
+    el.classList.toggle('show', show);
+    const input = el.previousElementSibling?.tagName === 'INPUT'
+      ? el.previousElementSibling
+      : el.parentElement.querySelector('input');
+    if (input) input.classList.toggle('error', show);
+  }
+
+  function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  // ═══════════════════════════════════════
+  // ALERT
+  // ═══════════════════════════════════════
+  function showAlert(text, type = 'error') {
+    const box = document.getElementById('alertBox');
+    const textEl = document.getElementById('alertText');
+    box.className = `alert ${type} show`;
+    textEl.textContent = text;
+  }
+  function hideAlert() {
+    document.getElementById('alertBox').classList.remove('show');
+  }
+
+  // ═══════════════════════════════════════
+  // PASSWORD TOGGLE
+  // ═══════════════════════════════════════
+  function togglePass(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const isPass = input.type === 'password';
+    input.type = isPass ? 'text' : 'password';
+    btn.innerHTML = isPass
+      ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`
+      : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+  }
+
+  // ═══════════════════════════════════════
+  // LOGIN
+  // ═══════════════════════════════════════
+  function handleLogin() {
+    hideAlert();
+    const email = document.getElementById('loginEmail').value.trim();
+    const pass = document.getElementById('loginPass').value;
+    let valid = true;
+
+    // Validation
+    if (!isValidEmail(email)) { showFieldError('loginEmailErr', true); valid = false; }
+    else showFieldError('loginEmailErr', false);
+
+    if (!pass) { showFieldError('loginPassErr', true); valid = false; }
+    else showFieldError('loginPassErr', false);
+
+    if (!valid) return;
+
+    // Simulate loading
+    setLoading('login', true);
+
+    setTimeout(() => {
+      const users = getUsers();
+      const user = users.find(u => u.email === email);
+
+      if (!user) {
+        showAlert('Бұл email тіркелмеген. Алдымен тіркеліңіз.');
+        setLoading('login', false);
+        return;
+      }
+
+      if (user.password !== btoa(pass)) {
+        showAlert('Құпия сөз қате. Қайта енгізіңіз.');
+        setLoading('login', false);
+        return;
+      }
+
+      // Сессияны сақтау — браузерді жапса да сақталады
+      saveSession(user);
+      setLoading('login', false);
+      showSuccess(`Қош келдіңіз, ${user.name}!`, 'Gymix-ке сәтті кірдіңіз');
+    }, 800);
+  }
+
+  // ═══════════════════════════════════════
+  // REGISTER
+  // ═══════════════════════════════════════
+  function handleRegister() {
+    hideAlert();
+    const name = document.getElementById('regName').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+    const pass = document.getElementById('regPass').value;
+    const pass2 = document.getElementById('regPass2').value;
+    const agreed = document.getElementById('agreeCheck').checked;
+    let valid = true;
+
+    if (!name) { showFieldError('regNameErr', true); valid = false; }
+    else showFieldError('regNameErr', false);
+
+    if (!isValidEmail(email)) { showFieldError('regEmailErr', true); valid = false; }
+    else showFieldError('regEmailErr', false);
+
+    if (pass.length < 6) { showFieldError('regPassErr', true); valid = false; }
+    else showFieldError('regPassErr', false);
+
+    if (pass !== pass2) { showFieldError('regPass2Err', true); valid = false; }
+    else showFieldError('regPass2Err', false);
+
+    if (!agreed) {
+      showAlert('Пайдалану шарттарымен келісіңіз');
+      valid = false;
+    }
+
+    if (!valid) return;
+
+    setLoading('reg', true);
+
+    setTimeout(() => {
+      const users = getUsers();
+
+      // Email бар ма тексеру
+      if (users.find(u => u.email === email)) {
+        showAlert('Бұл email бұрыннан тіркелген. Кіріңіз.');
+        setLoading('reg', false);
+        return;
+      }
+
+      // Жаңа пайдаланушы жасау
+      const newUser = {
+        id: 'user_' + Date.now(),
+        name,
+        email,
+        password: btoa(pass), // base64 шифрлау
+        avatar: '',
+        subscription: null,
+        visits: [],
+        createdAt: new Date().toISOString()
+      };
+
+      users.push(newUser);
+      saveUsers(users);      // Барлық пайдаланушылар тізімі
+      saveSession(newUser);  // Ағымдағы сессия
+
+      setLoading('reg', false);
+      showSuccess('Тіркелу сәтті!', `${name}, Gymix-ке қош келдіңіз!`);
+    }, 900);
+  }
+
+  // ═══════════════════════════════════════
+  // HELPERS
+  // ═══════════════════════════════════════
+  function setLoading(type, loading) {
+    const spinner = document.getElementById(type === 'login' ? 'loginSpinner' : 'regSpinner');
+    const btn = spinner.parentElement;
+    spinner.style.display = loading ? 'inline-block' : 'none';
+    btn.disabled = loading;
+  }
+
+  function showSuccess(title, text) {
+    // Барлық панельдерді жасыру
+    document.getElementById('loginPanel').style.display = 'none';
+    document.getElementById('registerPanel').style.display = 'none';
+    document.querySelector('.tabs').style.display = 'none';
+    document.querySelector('.auth-logo').style.display = 'none';
+    hideAlert();
+
+    // Success box-ты көрсету
+    const box = document.getElementById('successBox');
+    document.getElementById('successTitle').textContent = title;
+    document.getElementById('successText').textContent = text;
+    box.style.display = 'block';
+
+    // 1.5 секундтан кейін автоматты профильге өту
+    setTimeout(() => {
+      window.location.href = '../profile.html';
+    }, 1500);
+  }
+
+  function goToProfile() {
+    window.location.href = '../profile.html';
+  }
+
+  // Enter пернесімен жіберу
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      if (document.getElementById('loginPanel').classList.contains('active')) handleLogin();
+      else handleRegister();
+    }
+  });
+</script>
+
+</body>
+</html>
