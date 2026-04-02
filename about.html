@@ -1,2 +1,473 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gymix — Біз туралы</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --purple: #6C5CE7;
+      --purple-dark: #5849c4;
+      --purple-light: #a29bfe;
+      --white: #ffffff;
+      --off-white: #f4f5fb;
+      --dark: #111118;
+      --gray: #888899;
+      --gray-light: #eef0f8;
+      --radius: 20px;
+      --radius-lg: 28px;
+      --red: #ff4757;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Noto Sans', sans-serif; background: var(--off-white); color: var(--dark); }
 
+    /* HEADER */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      height: 56px; display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px;
+      background: rgba(255,255,255,0.96); backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(0,0,0,0.06); transition: box-shadow 0.3s;
+    }
+    header.scrolled { box-shadow: 0 2px 24px rgba(108,92,231,0.10); }
+    .logo { display: flex; align-items: center; text-decoration: none; }
+    .logo img { height: 34px; object-fit: contain; }
+    nav { display: flex; align-items: center; gap: 4px; position: absolute; left: 50%; transform: translateX(-50%); }
+    nav a { padding: 6px 14px; border-radius: 50px; text-decoration: none; font-size: 13.5px; font-weight: 500; color: #333; transition: all 0.18s; white-space: nowrap; }
+    nav a:hover { background: var(--off-white); color: var(--purple); }
+    nav a.active { color: var(--purple); font-weight: 600; }
+    .header-right { display: flex; align-items: center; gap: 10px; }
+    .btn-login { padding: 8px 20px; border-radius: 50px; border: 1.5px solid #ddd; background: transparent; color: #333; font-family: 'Noto Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: none; transition: all 0.2s; }
+    .btn-login:hover { border-color: var(--purple); color: var(--purple); }
+    .btn-download { padding: 9px 22px; border-radius: 50px; border: none; background: var(--dark); color: white; font-family: 'Noto Sans', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; text-decoration: none; transition: all 0.2s; }
+    .btn-download:hover { background: var(--purple); transform: translateY(-1px); }
+    .header-user { display: flex; align-items: center; gap: 10px; }
+    .header-avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--purple), var(--purple-light)); display: flex; align-items: center; justify-content: center; color: white; font-size: 13px; font-weight: 700; overflow: hidden; flex-shrink: 0; cursor: pointer; text-decoration: none; border: 2px solid rgba(108,92,231,0.3); }
+    .header-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .header-username { font-size: 13.5px; font-weight: 600; color: var(--dark); text-decoration: none; transition: color 0.2s; }
+    .header-username:hover { color: var(--purple); }
+    .btn-logout-sm { padding: 8px 16px; border-radius: 50px; border: 1.5px solid #ddd; background: transparent; color: var(--gray); font-family: 'Noto Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn-logout-sm:hover { border-color: var(--red); color: var(--red); }
+
+    /* PAGE */
+    .page { padding: 80px 40px 80px; max-width: 860px; margin: 0 auto; }
+
+    /* HERO */
+    .about-hero {
+      background: linear-gradient(128deg, #5c4fd6 0%, #6C5CE7 40%, #8b6ff5 70%, #a480f0 100%);
+      border-radius: var(--radius-lg);
+      padding: 56px 48px;
+      margin-bottom: 40px;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+    .about-hero::before {
+      content: '';
+      position: absolute; top: -60px; right: -60px;
+      width: 280px; height: 280px; border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+    }
+    .about-hero h1 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 900; margin-bottom: 16px; position: relative; z-index: 1;
+    }
+    .about-hero p {
+      font-size: 16px; color: rgba(255,255,255,0.8);
+      line-height: 1.65; max-width: 560px; position: relative; z-index: 1;
+    }
+
+    /* STATS */
+    .stats-row {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+      margin-bottom: 40px;
+    }
+    .stat-card {
+      background: white; border-radius: var(--radius); padding: 28px 20px;
+      text-align: center; box-shadow: 0 4px 20px rgba(108,92,231,0.07);
+    }
+    .stat-num {
+      font-family: 'Montserrat', sans-serif; font-size: 38px; font-weight: 900;
+      color: var(--purple); margin-bottom: 6px;
+    }
+    .stat-label { font-size: 13px; color: var(--gray); font-weight: 600; }
+
+    /* FAQ */
+    .faq-section { background: white; border-radius: var(--radius-lg); padding: 36px; box-shadow: 0 4px 20px rgba(108,92,231,0.07); }
+    .faq-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 22px; font-weight: 800;
+      color: var(--purple);
+      margin-bottom: 24px;
+    }
+
+    .faq-item {
+      border-radius: 14px;
+      border: 1.5px solid #ebebf5;
+      margin-bottom: 10px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .faq-item.open { border-color: var(--purple-light); }
+
+    .faq-q {
+      width: 100%; display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 20px; background: white; border: none; cursor: pointer;
+      text-align: left; font-family: 'Noto Sans', sans-serif;
+      font-size: 14.5px; font-weight: 600; color: var(--dark);
+      gap: 12px; transition: background 0.2s;
+    }
+    .faq-q:hover { background: var(--off-white); }
+    .faq-item.open .faq-q { background: var(--off-white); color: var(--purple); }
+
+    .faq-icon {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--gray-light); display: flex; align-items: center;
+      justify-content: center; flex-shrink: 0;
+      transition: all 0.3s; color: var(--gray);
+    }
+    .faq-item.open .faq-icon {
+      background: var(--purple); color: white; transform: rotate(180deg);
+    }
+
+    .faq-a {
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.35s ease, padding 0.25s;
+      padding: 0 20px;
+    }
+    .faq-a-inner {
+      padding: 4px 0 18px;
+      font-size: 14px; color: var(--gray); line-height: 1.7;
+      border-top: 1px solid #ebebf5;
+    }
+    .faq-item.open .faq-a { max-height: 300px; }
+
+    /* CONTACT */
+    .contact-section {
+      background: white; border-radius: var(--radius-lg); padding: 36px;
+      box-shadow: 0 4px 20px rgba(108,92,231,0.07); margin-top: 20px;
+    }
+    .contact-title { font-family: 'Montserrat', sans-serif; font-size: 20px; font-weight: 800; margin-bottom: 20px; }
+    .contact-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .contact-card {
+      display: flex; align-items: center; gap: 14px;
+      background: var(--off-white); border-radius: var(--radius); padding: 18px;
+    }
+    .contact-icon { font-size: 28px; flex-shrink: 0; }
+    .contact-label { font-size: 11.5px; color: var(--gray); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; }
+    .contact-val { font-size: 14px; font-weight: 700; color: var(--dark); }
+
+    /* FOOTER */
+    footer { background: #0d0d14; padding: 48px 40px 24px; color: rgba(255,255,255,0.5); margin-top: 60px; }
+    .footer-bottom { display: flex; justify-content: space-between; align-items: center; font-size: 12.5px; }
+
+    /* REVEAL */
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+    .d1 { transition-delay: .1s; } .d2 { transition-delay: .2s; }
+
+    @media(max-width:768px) {
+      header { padding: 0 16px; } nav { display: none; }
+      .page { padding: 72px 16px 60px; }
+      .stats-row { grid-template-columns: repeat(3,1fr); gap: 10px; }
+      .contact-grid { grid-template-columns: 1fr; }
+      .about-hero { padding: 36px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<header id="hdr">
+  <a href="../index.html" class="logo">
+    <img src="../images/logo/gymix-logo.png" alt="Gymix">
+  </a>
+  <nav>
+    <a href="../index.html">Басты бет</a>
+    <a href="../search.html">Барлық залдар</a>
+    <a href="../subscription.html">Абонемент</a>
+    <a href="../extra.html">Extra</a>
+    <a href="../profile.html">Профиль</a>
+    <a href="../about.html" class="active">Біз туралы</a>
+  </nav>
+  <div class="header-right" id="headerRight">
+    <a href="../pages/login.html" class="btn-login">Кіру</a>
+    <a href="../subscription.html" class="btn-download">Абонемент алу</a>
+  </div>
+</header>
+
+<div class="page">
+
+  <!-- HERO -->
+  <div class="about-hero reveal">
+    <h1>Gymix туралы</h1>
+    <p>Gymix — Астанадағы ең ірі фитнес абонемент платформасы. Бір абонементпен қаладағы 100-ден астам спорт клубына кіру мүмкіндігін береміз. Йога, жүзу, жекпе-жек, тренажер залы — бәрі бір жерде.</p>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card reveal">
+      <div class="stat-num">100+</div>
+      <div class="stat-label">Спорт клубы</div>
+    </div>
+    <div class="stat-card reveal d1">
+      <div class="stat-num">5 000+</div>
+      <div class="stat-label">Белсенді мүше</div>
+    </div>
+    <div class="stat-card reveal d2">
+      <div class="stat-num">6</div>
+      <div class="stat-label">Спорт түрі</div>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="faq-section reveal">
+    <div class="faq-title">Жиі қойылатын сұрақтар</div>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Gymix дегеніміз не?
+        <span class="faq-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </button>
+      <div class="faq-a">
+        <div class="faq-a-inner">Gymix — бір абонементпен Астанадағы 100-ден астам спорт клубына кіруге мүмкіндік беретін фитнес платформасы. Тренажер залы, бассейн, йога, жекпе-жек және тағы басқа — бәрі бір картада.</div>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Абонементті қалай сатып алуға болады?
+        <span class="faq-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </button>
+      <div class="faq-a">
+        <div class="faq-a-inner">Тіркеліп, "Абонемент" бетіне өтіп, өзіңізге қолайлы тарифті таңдаңыз. Таңғы, Кешкі, Шексіз немесе VIP Премиум — бәрі онлайн сатып алынады. Төлем жасаған соң абонемент бірден белсенді болады.</div>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Залға қалай кіремін?
+        <span class="faq-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </button>
+      <div class="faq-a">
+        <div class="faq-a-inner">Профиліңіздегі QR-кодты залдың ресепшенінде сканерлейсіз — сол болды. Тіркелу немесе алдын ала жазылу қажет емес, тек QR-кодыңыз болса жеткілікті.</div>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Бір күнде неше рет залға кіре аламын?
+        <span class="faq-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </button>
+      <div class="faq-a">
+        <div class="faq-a-inner">Шексіз және VIP Премиум тарифтерінде күніне бір рет кіруге болады, бірақ әртүрлі залдарға шектеусіз өтуге болады. Таңғы және Кешкі тарифтерінде белгіленген уақытта ғана кіру мүмкін.</div>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Абонементті тоқтата тұруға бола ма?
+        <span class="faq-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </button>
+      <div class="faq-a">
+        <div class="faq-a-inner">Иә, абонементіңізді ауруханаға жатқан жағдайда немесе демалысқа шыққанда тоқтата тұруға болады. Бұл үшін қолдау қызметіне хабарласыңыз. Тоқтату мерзімі ескеріліп, абонемент мерзімі ұзартылады.</div>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Абонементті болдырмауға бола ма?
+        <span class="faq-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </button>
+      <div class="faq-a">
+        <div class="faq-a-inner">Сатып алған күні болдырмау мүмкін. Кейін болдырмасаңыз, абонемент мерзімі аяқталғанша жұмыс істей береді, ақша қайтарылмайды. Толық ақпарат үшін қолдау қызметіне хабарласыңыз.</div>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Сабаққа алдын ала жазылу керек пе?
+        <span class="faq-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </button>
+      <div class="faq-a">
+        <div class="faq-a-inner">Тренажер залдары мен бассейндерге жазылу қажет емес — тікелей кіресіз. Топтық сабақтарға (йога, пилатес, HIIT) кейбір залдарда алдын ала жазылу талап етілуі мүмкін.</div>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Бір абонементті бірнеше адам пайдалана алады ма?
+        <span class="faq-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </button>
+      <div class="faq-a">
+        <div class="faq-a-inner">Жоқ, абонемент тек бір адамға арналған және жеке QR-кодпен ұсынылады. Бірақ VIP Премиум тарифінде достыңызды бір рет ала келу мүмкіндігі бар.</div>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Сабаққа кешігуге бола ма?
+        <span class="faq-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </button>
+      <div class="faq-a">
+        <div class="faq-a-inner">Тренажер залдарына уақытта шектеу жоқ — кез келген уақытта кіресіз. Топтық сабақтарда кешіктіру ұсынылмайды, себебі бұл басқа қатысушыларға кедергі жасауы мүмкін.</div>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Бөліп төлеу мүмкіндігі бар ма?
+        <span class="faq-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </button>
+      <div class="faq-a">
+        <div class="faq-a-inner">Иә! Gymix абонементін бөліп төлеуге болады. Бұл фитнес жазылымы сияқты — бірден төлемейсіз, ай сайын аз-аздан төлейсіз. Банк карталары арқылы автоматты есептен шығарылады.</div>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Промокод қолдануға бола ма?
+        <span class="faq-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </button>
+      <div class="faq-a">
+        <div class="faq-a-inner">Иә, промокодыңыз болса, абонемент сатып алу кезінде енгізсеңіз жеңілдік қолданылады. Сондай-ақ достарыңызға абонементті сыйлыққа беруге де болады.</div>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Қолдау қызметіне қалай хабарласуға болады?
+        <span class="faq-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </button>
+      <div class="faq-a">
+        <div class="faq-a-inner">Бізге info@gymix.kz электрондық поштасы арқылы немесе +7 (727) 123-45-67 телефоны арқылы хабарласуға болады. Жұмыс уақыты: дүйсенбі–жұма, 09:00–18:00.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CONTACTS -->
+  <div class="contact-section reveal">
+    <div class="contact-title">Байланыс</div>
+    <div class="contact-grid">
+      <div class="contact-card">
+        <div class="contact-icon">📞</div>
+        <div>
+          <div class="contact-label">Телефон</div>
+          <div class="contact-val">+7 (727) 123-45-67</div>
+        </div>
+      </div>
+      <div class="contact-card">
+        <div class="contact-icon">✉️</div>
+        <div>
+          <div class="contact-label">Email</div>
+          <div class="contact-val">info@gymix.kz</div>
+        </div>
+      </div>
+      <div class="contact-card">
+        <div class="contact-icon">📍</div>
+        <div>
+          <div class="contact-label">Қала</div>
+          <div class="contact-val">Астана, Қазақстан</div>
+        </div>
+      </div>
+      <div class="contact-card">
+        <div class="contact-icon">🕐</div>
+        <div>
+          <div class="contact-label">Жұмыс уақыты</div>
+          <div class="contact-val">Дс–Жм, 09:00–18:00</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-bottom">
+    <span>© 2026 Gymix. Барлық құқықтар қорғалған.</span>
+    <span>🇰🇿 Астана, Қазақстан</span>
+  </div>
+</footer>
+
+<script>
+  // Header scroll
+  const hdr = document.getElementById('hdr');
+  window.addEventListener('scroll', () => hdr.classList.toggle('scrolled', window.scrollY > 10));
+
+  // Reveal
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('in'); obs.unobserve(e.target); } });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+  // FAQ accordion
+  function toggleFaq(btn) {
+    const item = btn.closest('.faq-item');
+    const isOpen = item.classList.contains('open');
+    // Барлығын жабу
+    document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+    // Егер жабық болса — ашу
+    if (!isOpen) item.classList.add('open');
+  }
+
+  // Session check
+  function checkSession() {
+    const session = JSON.parse(localStorage.getItem('gymix_session') || 'null');
+    const headerRight = document.getElementById('headerRight');
+    if (!headerRight) return;
+    if (session && session.loggedIn) {
+      const initials = session.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+      const avatarContent = session.avatar ? `<img src="${session.avatar}" alt="avatar">` : initials;
+      headerRight.innerHTML = `
+        <div class="header-user">
+          <a href="../profile.html" class="header-avatar">${avatarContent}</a>
+          <a href="../profile.html" class="header-username">${session.name}</a>
+          <button class="btn-logout-sm" onclick="logoutUser()">Шығу</button>
+        </div>
+        <a href="../subscription.html" class="btn-download">Абонемент алу</a>`;
+    } else {
+      headerRight.innerHTML = `
+        <a href="../pages/login.html" class="btn-login">Кіру</a>
+        <a href="../subscription.html" class="btn-download">Абонемент алу</a>`;
+    }
+  }
+  function logoutUser() {
+    localStorage.removeItem('gymix_session');
+    window.location.reload();
+  }
+  checkSession();
+</script>
+
+</body>
+</html>
 

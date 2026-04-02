@@ -1,2 +1,887 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gymix — Абонемент</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --purple: #6C5CE7;
+      --purple-dark: #5849c4;
+      --purple-light: #a29bfe;
+      --white: #ffffff;
+      --off-white: #f4f5fb;
+      --dark: #111118;
+      --gray: #888899;
+      --gray-light: #eef0f8;
+      --radius: 20px;
+      --radius-lg: 28px;
+      --green: #26c75a;
+      --red: #ff4757;
+      --orange: #ff9f43;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Noto Sans', sans-serif; background: var(--off-white); color: var(--dark); }
 
+    /* ── HEADER ── */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      height: 56px; display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px;
+      background: rgba(255,255,255,0.96); backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(0,0,0,0.06); transition: box-shadow 0.3s;
+    }
+    header.scrolled { box-shadow: 0 2px 24px rgba(108,92,231,0.10); }
+    .logo { display: flex; align-items: center; text-decoration: none; }
+    .logo img { height: 34px; object-fit: contain; }
+    nav { display: flex; align-items: center; gap: 4px; position: absolute; left: 50%; transform: translateX(-50%); }
+    nav a { padding: 6px 14px; border-radius: 50px; text-decoration: none; font-size: 13.5px; font-weight: 500; color: #333; transition: all 0.18s; white-space: nowrap; }
+    nav a:hover { background: var(--off-white); color: var(--purple); }
+    nav a.active { color: var(--purple); font-weight: 600; }
+    .header-right { display: flex; align-items: center; gap: 10px; }
+    .btn-login { padding: 8px 20px; border-radius: 50px; border: 1.5px solid #ddd; background: transparent; color: #333; font-family: 'Noto Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: none; transition: all 0.2s; }
+    .btn-login:hover { border-color: var(--purple); color: var(--purple); }
+    .btn-download { padding: 9px 22px; border-radius: 50px; border: none; background: var(--dark); color: white; font-family: 'Noto Sans', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; text-decoration: none; transition: all 0.2s; }
+    .btn-download:hover { background: var(--purple); transform: translateY(-1px); }
+    .header-user { display: flex; align-items: center; gap: 10px; }
+    .header-avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--purple), var(--purple-light)); display: flex; align-items: center; justify-content: center; color: white; font-size: 13px; font-weight: 700; overflow: hidden; flex-shrink: 0; cursor: pointer; text-decoration: none; border: 2px solid rgba(108,92,231,0.3); }
+    .header-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .header-username { font-size: 13.5px; font-weight: 600; color: var(--dark); text-decoration: none; transition: color 0.2s; }
+    .header-username:hover { color: var(--purple); }
+    .btn-logout-sm { padding: 8px 16px; border-radius: 50px; border: 1.5px solid #ddd; background: transparent; color: var(--gray); font-family: 'Noto Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn-logout-sm:hover { border-color: var(--red); color: var(--red); }
+
+    /* ── PAGE ── */
+    .page { padding: 80px 40px 80px; max-width: 860px; margin: 0 auto; }
+
+    /* ── CURRENT SUBSCRIPTION CARD ── */
+    .sub-card {
+      border-radius: var(--radius-lg);
+      padding: 36px;
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+      color: white;
+      background: linear-gradient(135deg, #5c4fd6 0%, #6C5CE7 50%, #9b7ff5 100%);
+      box-shadow: 0 12px 48px rgba(108,92,231,0.3);
+    }
+    .sub-card::before {
+      content: '';
+      position: absolute; top: -60px; right: -60px;
+      width: 220px; height: 220px; border-radius: 50%;
+      background: rgba(255,255,255,0.07);
+    }
+    .sub-card::after {
+      content: '';
+      position: absolute; bottom: -40px; left: 30%;
+      width: 160px; height: 160px; border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+    }
+    .sub-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 28px; position: relative; z-index: 1; }
+    .sub-card-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; opacity: 0.7; margin-bottom: 6px; }
+    .sub-card-name { font-family: 'Montserrat', sans-serif; font-size: 28px; font-weight: 900; }
+    .sub-status {
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,0.15); border-radius: 50px;
+      padding: 6px 14px; font-size: 12.5px; font-weight: 700;
+      backdrop-filter: blur(8px);
+    }
+    .sub-status-dot { width: 7px; height: 7px; border-radius: 50%; background: #4eff91; animation: pulse 2s infinite; }
+    .sub-card-info { display: flex; gap: 40px; position: relative; z-index: 1; }
+    .sub-info-item {}
+    .sub-info-label { font-size: 11px; opacity: 0.65; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.06em; }
+    .sub-info-val { font-family: 'Montserrat', sans-serif; font-size: 17px; font-weight: 800; }
+    .no-sub-card {
+      border-radius: var(--radius-lg); padding: 40px;
+      background: white; text-align: center;
+      box-shadow: 0 4px 24px rgba(108,92,231,0.07);
+      margin-bottom: 20px;
+    }
+    .no-sub-icon { font-size: 56px; margin-bottom: 16px; }
+    .no-sub-title { font-family: 'Montserrat', sans-serif; font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+    .no-sub-text { color: var(--gray); font-size: 14px; }
+
+    /* ── ACTION BUTTONS ── */
+    .action-btns {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+      margin-bottom: 32px;
+    }
+    .action-btn {
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      padding: 24px 16px; border-radius: var(--radius);
+      background: white; border: 2px solid transparent;
+      cursor: pointer; transition: all 0.25s;
+      box-shadow: 0 4px 20px rgba(108,92,231,0.07);
+    }
+    .action-btn:hover { border-color: var(--purple); transform: translateY(-3px); box-shadow: 0 12px 32px rgba(108,92,231,0.15); }
+    .action-btn-icon { font-size: 32px; }
+    .action-btn-label { font-family: 'Montserrat', sans-serif; font-size: 13px; font-weight: 700; text-align: center; color: var(--dark); }
+    .action-btn-sub { font-size: 11.5px; color: var(--gray); text-align: center; }
+
+    /* ── PLANS GRID ── */
+    .section-title { font-family: 'Montserrat', sans-serif; font-size: 20px; font-weight: 800; margin-bottom: 20px; }
+    .plans-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 32px; }
+    .plan-card {
+      background: white; border-radius: var(--radius-lg); padding: 28px 24px;
+      border: 2px solid transparent; position: relative; transition: all 0.3s;
+      box-shadow: 0 4px 20px rgba(108,92,231,0.07); cursor: pointer;
+    }
+    .plan-card:hover { border-color: var(--purple-light); transform: translateY(-3px); box-shadow: 0 12px 40px rgba(108,92,231,0.13); }
+    .plan-card.selected { border-color: var(--purple); box-shadow: 0 8px 32px rgba(108,92,231,0.2); }
+    .plan-badge { position: absolute; top: -13px; left: 50%; transform: translateX(-50%); background: var(--orange); color: white; font-size: 10.5px; font-weight: 800; padding: 4px 16px; border-radius: 50px; white-space: nowrap; }
+    .plan-icon { font-size: 26px; margin-bottom: 10px; }
+    .plan-name { font-family: 'Montserrat', sans-serif; font-size: 17px; font-weight: 800; margin-bottom: 4px; }
+    .plan-price { font-family: 'Montserrat', sans-serif; font-size: 26px; font-weight: 900; color: var(--purple); margin-bottom: 2px; }
+    .plan-price span { font-size: 13px; font-weight: 500; color: var(--gray); }
+    .plan-time { font-size: 12px; color: var(--gray); margin-bottom: 16px; }
+    .plan-features { list-style: none; }
+    .plan-features li { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: #555; padding: 4px 0; }
+    .chk { display: inline-flex; width: 17px; height: 17px; border-radius: 50%; background: #e7f9ee; flex-shrink: 0; margin-top: 1px; align-items: center; justify-content: center; }
+
+    /* ── FAQ ── */
+    .faq-wrap { background: white; border-radius: var(--radius-lg); padding: 28px; box-shadow: 0 4px 20px rgba(108,92,231,0.07); }
+    .faq-item { border-radius: 12px; border: 1.5px solid #ebebf5; margin-bottom: 8px; overflow: hidden; }
+    .faq-item.open { border-color: var(--purple-light); }
+    .faq-q { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; background: white; border: none; cursor: pointer; text-align: left; font-family: 'Noto Sans', sans-serif; font-size: 14px; font-weight: 600; color: var(--dark); gap: 12px; transition: background 0.2s; }
+    .faq-q:hover { background: var(--off-white); }
+    .faq-item.open .faq-q { background: var(--off-white); color: var(--purple); }
+    .faq-icon { width: 26px; height: 26px; border-radius: 50%; background: var(--gray-light); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.3s; }
+    .faq-item.open .faq-icon { background: var(--purple); color: white; transform: rotate(180deg); }
+    .faq-a { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; padding: 0 18px; }
+    .faq-a-inner { padding: 4px 0 16px; font-size: 13.5px; color: var(--gray); line-height: 1.7; border-top: 1px solid #ebebf5; }
+    .faq-item.open .faq-a { max-height: 200px; }
+
+    /* ── MODALS ── */
+    .overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+      z-index: 2000; display: none; align-items: center; justify-content: center;
+      backdrop-filter: blur(4px); padding: 20px;
+    }
+    .overlay.show { display: flex; }
+    .modal {
+      background: white; border-radius: var(--radius-lg); padding: 36px;
+      width: 100%; max-width: 480px; position: relative;
+      animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
+      max-height: 90vh; overflow-y: auto;
+    }
+    @keyframes popIn { from{opacity:0;transform:scale(0.85)} to{opacity:1;transform:scale(1)} }
+    .modal-close {
+      position: absolute; top: 16px; right: 16px;
+      width: 32px; height: 32px; border-radius: 50%; border: none;
+      background: var(--gray-light); cursor: pointer; display: flex;
+      align-items: center; justify-content: center; font-size: 16px;
+      transition: background 0.2s;
+    }
+    .modal-close:hover { background: #ddd; }
+    .modal-title { font-family: 'Montserrat', sans-serif; font-size: 20px; font-weight: 800; margin-bottom: 24px; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 7px; }
+    .form-group input, .form-group select {
+      width: 100%; padding: 13px 16px; border-radius: 14px;
+      border: 1.5px solid #e0e0e8; font-family: 'Noto Sans', sans-serif;
+      font-size: 14px; color: var(--dark); background: var(--off-white);
+      outline: none; transition: all 0.2s;
+    }
+    .form-group input:focus, .form-group select:focus { border-color: var(--purple); box-shadow: 0 0 0 3px rgba(108,92,231,0.12); background: white; }
+    .card-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .btn-modal {
+      width: 100%; padding: 14px; border-radius: 50px; border: none;
+      background: var(--purple); color: white; font-family: 'Noto Sans', sans-serif;
+      font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 8px;
+      transition: all 0.2s; box-shadow: 0 6px 24px rgba(108,92,231,0.3);
+    }
+    .btn-modal:hover { background: var(--purple-dark); transform: translateY(-1px); }
+    .btn-modal:disabled { background: var(--gray); box-shadow: none; cursor: not-allowed; transform: none; }
+    .promo-result { padding: 12px 16px; border-radius: 12px; font-size: 13.5px; margin-top: 12px; display: none; }
+    .promo-result.success { background: #f0fff5; color: #1a9648; border: 1px solid #b8f0ce; display: block; }
+    .promo-result.error { background: #fff0f0; color: var(--red); border: 1px solid #ffd0d0; display: block; }
+    .order-summary {
+      background: var(--off-white); border-radius: var(--radius); padding: 18px;
+      margin-bottom: 20px;
+    }
+    .order-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 14px; }
+    .order-row.total { border-top: 1px solid #e0e0e8; margin-top: 8px; padding-top: 12px; font-weight: 700; font-size: 16px; }
+    .order-row.discount { color: var(--green); font-weight: 600; }
+    .order-row .label { color: var(--gray); }
+
+    /* ── RECEIPT ── */
+    .receipt {
+      background: white; border: 2px dashed #e0e0e8;
+      border-radius: var(--radius-lg); padding: 32px 28px;
+      text-align: center; max-width: 420px; margin: 0 auto;
+    }
+    .receipt-logo { font-family: 'Montserrat', sans-serif; font-size: 22px; font-weight: 900; color: var(--purple); margin-bottom: 4px; }
+    .receipt-subtitle { font-size: 12px; color: var(--gray); margin-bottom: 24px; }
+    .receipt-check { font-size: 48px; margin-bottom: 12px; }
+    .receipt-status { font-family: 'Montserrat', sans-serif; font-size: 18px; font-weight: 800; color: var(--green); margin-bottom: 20px; }
+    .receipt-divider { border: none; border-top: 1px dashed #e0e0e8; margin: 16px 0; }
+    .receipt-row { display: flex; justify-content: space-between; font-size: 13.5px; padding: 5px 0; }
+    .receipt-row .r-label { color: var(--gray); }
+    .receipt-row .r-val { font-weight: 600; }
+    .receipt-total { display: flex; justify-content: space-between; font-family: 'Montserrat', sans-serif; font-size: 18px; font-weight: 800; padding: 12px 0 4px; }
+    .receipt-id { font-size: 11px; color: var(--gray); margin-top: 16px; }
+    .btn-print { margin-top: 20px; padding: 12px 28px; border-radius: 50px; border: 1.5px solid var(--purple); background: transparent; color: var(--purple); font-family: 'Noto Sans', sans-serif; font-size: 13.5px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+    .btn-print:hover { background: var(--purple); color: white; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    .reveal { opacity:0; transform:translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .reveal.in { opacity:1; transform:translateY(0); }
+    .d1{transition-delay:.1s} .d2{transition-delay:.2s}
+
+    @media(max-width:768px) {
+      header{padding:0 16px;} nav{display:none;}
+      .page{padding:72px 16px 60px;}
+      .action-btns{grid-template-columns:1fr;}
+      .plans-grid{grid-template-columns:1fr;}
+      .card-row{grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+<body>
+
+<header id="hdr">
+  <a href="index.html" class="logo">
+    <img src="images/logo/gymix-logo.png" alt="Gymix">
+  </a>
+  <nav>
+    <a href="index.html">Басты бет</a>
+    <a href="search.html">Барлық залдар</a>
+    <a href="subscription.html" class="active">Абонемент</a>
+    <a href="extra.html">Extra</a>
+    <a href="profile.html">Профиль</a>
+    <a href="about.html">Біз туралы</a>
+  </nav>
+  <div class="header-right" id="headerRight">
+    <a href="pages/login.html" class="btn-login">Кіру</a>
+    <a href="subscription.html" class="btn-download">Абонемент алу</a>
+  </div>
+</header>
+
+<div class="page">
+
+  <!-- CURRENT SUBSCRIPTION -->
+  <div id="subCardWrap" class="reveal"></div>
+
+  <!-- ACTION BUTTONS -->
+  <div class="action-btns reveal d1">
+    <button class="action-btn" onclick="openModal('buyModal')">
+      <span class="action-btn-icon">🛒</span>
+      <span class="action-btn-label">Абонемент сатып алу</span>
+      <span class="action-btn-sub">4 тариф қол жетімді</span>
+    </button>
+    <button class="action-btn" onclick="openModal('promoModal')">
+      <span class="action-btn-icon">🎟️</span>
+      <span class="action-btn-label">Промокод белсендіру</span>
+      <span class="action-btn-sub">Жеңілдік алыңыз</span>
+    </button>
+    <button class="action-btn" onclick="openModal('giftModal')">
+      <span class="action-btn-icon">🎁</span>
+      <span class="action-btn-label">Сыйлыққа сатып алу</span>
+      <span class="action-btn-sub">Досыңызға беріңіз</span>
+    </button>
+  </div>
+
+  <!-- PLANS -->
+  <div class="section-title reveal">Тариф жоспарлары</div>
+  <div class="plans-grid">
+    <div class="plan-card reveal" onclick="selectPlan(this,'Таңғы',19900)">
+      <div class="plan-icon">🌅</div>
+      <div class="plan-name">Таңғы</div>
+      <div class="plan-price">19 900 ₸<span> /ай</span></div>
+      <div class="plan-time">07:00 – 13:00 дейін</div>
+      <ul class="plan-features">
+        <li><span class="chk"><svg width="9" height="7" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="#26c75a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Жаттығу залы (таңғы)</li>
+        <li><span class="chk"><svg width="9" height="7" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="#26c75a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Кардио аймақ</li>
+        <li><span class="chk"><svg width="9" height="7" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="#26c75a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Сауна (апта 1 рет)</li>
+      </ul>
+    </div>
+
+    <div class="plan-card reveal d1" onclick="selectPlan(this,'Шексіз',29900)" style="border-color: var(--purple);">
+      <div class="plan-badge">ҮЗДІК ТАҢДАУ</div>
+      <div class="plan-icon">⚡</div>
+      <div class="plan-name">Шексіз</div>
+      <div class="plan-price">29 900 ₸<span> /ай</span></div>
+      <div class="plan-time">07:00 – 23:00, кез келген уақыт</div>
+      <ul class="plan-features">
+        <li><span class="chk"><svg width="9" height="7" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="#26c75a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Толық залға кіру</li>
+        <li><span class="chk"><svg width="9" height="7" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="#26c75a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Топтық сабақтар</li>
+        <li><span class="chk"><svg width="9" height="7" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="#26c75a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Фитнес-тестілеу</li>
+      </ul>
+    </div>
+
+    <div class="plan-card reveal" onclick="selectPlan(this,'Кешкі',21900)">
+      <div class="plan-icon">🌙</div>
+      <div class="plan-name">Кешкі</div>
+      <div class="plan-price">21 900 ₸<span> /ай</span></div>
+      <div class="plan-time">17:00 – 23:00 дейін</div>
+      <ul class="plan-features">
+        <li><span class="chk"><svg width="9" height="7" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="#26c75a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Жаттығу залы (кешкі)</li>
+        <li><span class="chk"><svg width="9" height="7" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="#26c75a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Кардио-кинотеатр</li>
+        <li><span class="chk"><svg width="9" height="7" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="#26c75a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Кроссфит аймағы</li>
+      </ul>
+    </div>
+
+    <div class="plan-card reveal d1" onclick="selectPlan(this,'VIP Премиум',49900)">
+      <div class="plan-icon">👑</div>
+      <div class="plan-name">VIP Премиум</div>
+      <div class="plan-price">49 900 ₸<span> /ай</span></div>
+      <div class="plan-time">Кез келген уақыт + VIP аймақ</div>
+      <ul class="plan-features">
+        <li><span class="chk"><svg width="9" height="7" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="#26c75a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Жеке жаттықтырушы</li>
+        <li><span class="chk"><svg width="9" height="7" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="#26c75a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>СПА, массаж жеңілдік</li>
+        <li><span class="chk"><svg width="9" height="7" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="#26c75a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Қонақпен бірге кіру</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="section-title reveal">Жиі қойылатын сұрақтар</div>
+  <div class="faq-wrap reveal">
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">Абонементті тоқтата тұруға бола ма?
+        <span class="faq-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </button>
+      <div class="faq-a"><div class="faq-a-inner">Иә, ауруханаға жатқан жағдайда немесе демалысқа шыққанда тоқтата тұруға болады. Қолдау қызметіне хабарласыңыз.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">Бір абонементті бірнеше адам пайдалана алады ма?
+        <span class="faq-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </button>
+      <div class="faq-a"><div class="faq-a-inner">Жоқ, абонемент тек бір адамға арналған. VIP Премиум тарифінде ғана досыңызды бір рет ала келуге болады.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">Бөліп төлеу мүмкіндігі бар ма?
+        <span class="faq-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </button>
+      <div class="faq-a"><div class="faq-a-inner">Иә! Gymix абонементін бөліп төлеуге болады. Бірден төлемейсіз, ай сайын банк картаңыздан автоматты есептен шығарылады.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">Промокод қалай жұмыс істейді?
+        <span class="faq-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </button>
+      <div class="faq-a"><div class="faq-a-inner">Промокодыңызды "Промокод белсендіру" бөліміне енгізіңіз. Жеңілдік автоматты қолданылады. TURBO промокоды — 20% жеңілдік береді.</div></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════
+     MODAL 1: АБОНЕМЕНТ САТЫП АЛУ
+══════════════════════════════════ -->
+<div class="overlay" id="buyModal" onclick="closeOnOverlay(event,'buyModal')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('buyModal')">✕</button>
+    <div class="modal-title">🛒 Абонемент сатып алу</div>
+
+    <!-- Plan select -->
+    <div class="form-group">
+      <label>Тариф жоспары</label>
+      <select id="buyPlan" onchange="updateOrderSummary()">
+        <option value="19900" data-name="Таңғы">🌅 Таңғы — 19 900 ₸/ай</option>
+        <option value="29900" data-name="Шексіз" selected>⚡ Шексіз — 29 900 ₸/ай</option>
+        <option value="21900" data-name="Кешкі">🌙 Кешкі — 21 900 ₸/ай</option>
+        <option value="49900" data-name="VIP Премиум">👑 VIP Премиум — 49 900 ₸/ай</option>
+      </select>
+    </div>
+
+    <!-- Promo in buy -->
+    <div class="form-group">
+      <label>Промокод (міндетті емес)</label>
+      <div style="display:flex;gap:8px;">
+        <input type="text" id="buyPromo" placeholder="Промокодыңыз" style="text-transform:uppercase;">
+        <button onclick="applyPromoInBuy()" style="padding:13px 18px;border-radius:14px;border:none;background:var(--purple);color:white;font-weight:700;cursor:pointer;white-space:nowrap;font-size:13px;">Қолдану</button>
+      </div>
+      <div id="buyPromoResult" class="promo-result"></div>
+    </div>
+
+    <!-- Order summary -->
+    <div class="order-summary" id="orderSummary">
+      <div class="order-row"><span class="label">Тариф</span><span id="summaryPlan">Шексіз</span></div>
+      <div class="order-row"><span class="label">Бағасы</span><span id="summaryPrice">29 900 ₸</span></div>
+      <div class="order-row discount" id="discountRow" style="display:none;"><span>Жеңілдік</span><span id="summaryDiscount">-0 ₸</span></div>
+      <div class="order-row total"><span>Барлығы</span><span id="summaryTotal">29 900 ₸</span></div>
+    </div>
+
+    <!-- Card details -->
+    <div class="form-group">
+      <label>Карта нөмірі</label>
+      <input type="text" id="cardNum" placeholder="0000 0000 0000 0000" maxlength="19" oninput="formatCard(this)">
+    </div>
+    <div class="card-row">
+      <div class="form-group">
+        <label>Мерзімі</label>
+        <input type="text" id="cardExp" placeholder="MM/YY" maxlength="5" oninput="formatExp(this)">
+      </div>
+      <div class="form-group">
+        <label>CVV</label>
+        <input type="password" id="cardCvv" placeholder="•••" maxlength="3">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Карта иесінің аты</label>
+      <input type="text" id="cardName" placeholder="AZAT NURLANOV" style="text-transform:uppercase;">
+    </div>
+
+    <button class="btn-modal" id="payBtn" onclick="processPay()">💳 Төлеу</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     MODAL 2: ПРОМОКОД
+══════════════════════════════════ -->
+<div class="overlay" id="promoModal" onclick="closeOnOverlay(event,'promoModal')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('promoModal')">✕</button>
+    <div class="modal-title">🎟️ Промокод белсендіру</div>
+    <div class="form-group">
+      <label>Промокодыңызды енгізіңіз</label>
+      <input type="text" id="promoInput" placeholder="Мысалы: TURBO" style="text-transform:uppercase;font-size:18px;font-weight:700;letter-spacing:0.1em;" oninput="this.value=this.value.toUpperCase()">
+    </div>
+    <div id="promoResult" class="promo-result"></div>
+    <button class="btn-modal" onclick="activatePromo()">Белсендіру</button>
+    <p style="text-align:center;font-size:12px;color:var(--gray);margin-top:12px;">Промокод тікелей абонементке жеңілдік береді</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     MODAL 3: СЫЙЛЫҚҚА САТЫП АЛУ
+══════════════════════════════════ -->
+<div class="overlay" id="giftModal" onclick="closeOnOverlay(event,'giftModal')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('giftModal')">✕</button>
+    <div class="modal-title">🎁 Сыйлыққа абонемент</div>
+    <div class="form-group">
+      <label>Алушының аты-жөні</label>
+      <input type="text" id="giftName" placeholder="Досыңыздың аты">
+    </div>
+    <div class="form-group">
+      <label>Тариф жоспары</label>
+      <select id="giftPlan">
+        <option value="19900" data-name="Таңғы">🌅 Таңғы — 19 900 ₸</option>
+        <option value="29900" data-name="Шексіз" selected>⚡ Шексіз — 29 900 ₸</option>
+        <option value="21900" data-name="Кешкі">🌙 Кешкі — 21 900 ₸</option>
+        <option value="49900" data-name="VIP Премиум">👑 VIP Премиум — 49 900 ₸</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Сыйлық хабарламасы</label>
+      <input type="text" id="giftMsg" placeholder="Денсаулық тіле...">
+    </div>
+    <div class="form-group">
+      <label>Карта нөмірі</label>
+      <input type="text" id="giftCard" placeholder="0000 0000 0000 0000" maxlength="19" oninput="formatCard(this)">
+    </div>
+    <div class="card-row">
+      <div class="form-group">
+        <label>Мерзімі</label>
+        <input type="text" id="giftExp" placeholder="MM/YY" maxlength="5" oninput="formatExp(this)">
+      </div>
+      <div class="form-group">
+        <label>CVV</label>
+        <input type="password" id="giftCvv" placeholder="•••" maxlength="3">
+      </div>
+    </div>
+    <button class="btn-modal" onclick="processGift()">🎁 Сыйлық жіберу</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     MODAL 4: ЧЕК / RECEIPT
+══════════════════════════════════ -->
+<div class="overlay" id="receiptModal">
+  <div class="modal" style="max-width:420px;">
+    <div class="receipt" id="receiptContent">
+      <div class="receipt-logo">GYMIX</div>
+      <div class="receipt-subtitle">Астана, Қазақстан</div>
+      <div class="receipt-check">✅</div>
+      <div class="receipt-status">Төлем сәтті өтті!</div>
+      <hr class="receipt-divider">
+      <div class="receipt-row"><span class="r-label">Тариф</span><span class="r-val" id="rcPlan"></span></div>
+      <div class="receipt-row"><span class="r-label">Басталу күні</span><span class="r-val" id="rcStart"></span></div>
+      <div class="receipt-row"><span class="r-label">Аяқталу күні</span><span class="r-val" id="rcEnd"></span></div>
+      <div class="receipt-row" id="rcDiscountRow" style="display:none;"><span class="r-label">Жеңілдік</span><span class="r-val" style="color:var(--green)" id="rcDiscount"></span></div>
+      <hr class="receipt-divider">
+      <div class="receipt-total"><span>Барлығы</span><span id="rcTotal"></span></div>
+      <div class="receipt-id" id="rcId"></div>
+    </div>
+    <button class="btn-print" onclick="printReceipt()">🖨️ Чекті басып шығару</button>
+    <button class="btn-modal" onclick="closeModal('receiptModal');window.location.reload();" style="margin-top:10px;">Жабу</button>
+  </div>
+</div>
+
+<script>
+  // ══════════════════════════════════
+  // ПРОМОКОДТАР ЖҮЙЕСІ
+  // ══════════════════════════════════
+  const PROMO_CODES = {
+    'TURBO': { discount: 20, label: '20% жеңілдік' },
+    'GYMIX10': { discount: 10, label: '10% жеңілдік' },
+    'WELCOME': { discount: 15, label: '15% жеңілдік — жаңа мүше!' },
+  };
+
+  let appliedDiscount = 0;
+  let appliedPromoCode = '';
+
+  // ══════════════════════════════════
+  // SESSION & SUBSCRIPTION
+  // ══════════════════════════════════
+  function getSession() { return JSON.parse(localStorage.getItem('gymix_session') || 'null'); }
+  function getUsers()   { return JSON.parse(localStorage.getItem('gymix_users') || '[]'); }
+  function saveUsers(u) { localStorage.setItem('gymix_users', JSON.stringify(u)); }
+
+  function getCurrentUser() {
+    const s = getSession();
+    if (!s) return null;
+    return getUsers().find(u => u.id === s.id) || null;
+  }
+
+  function updateUser(updated) {
+    const users = getUsers();
+    const idx = users.findIndex(u => u.id === updated.id);
+    if (idx !== -1) { users[idx] = updated; saveUsers(users); }
+  }
+
+  // ══════════════════════════════════
+  // RENDER CURRENT SUBSCRIPTION
+  // ══════════════════════════════════
+  window.addEventListener('DOMContentLoaded', () => {
+    checkSession();
+    renderSubCard();
+
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('in'); obs.unobserve(e.target); } });
+    }, { threshold: 0.08 });
+    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+  });
+
+  function renderSubCard() {
+    const user = getCurrentUser();
+    const wrap = document.getElementById('subCardWrap');
+    if (!wrap) return;
+
+    const sub = user?.subscription;
+
+    if (sub) {
+      wrap.innerHTML = `
+        <div class="sub-card">
+          <div class="sub-card-top">
+            <div>
+              <div class="sub-card-label">Ағымдағы абонемент</div>
+              <div class="sub-card-name">${sub.name}</div>
+            </div>
+            <div class="sub-status"><span class="sub-status-dot"></span>Белсенді</div>
+          </div>
+          <div class="sub-card-info">
+            <div class="sub-info-item">
+              <div class="sub-info-label">Басталды</div>
+              <div class="sub-info-val">${sub.start}</div>
+            </div>
+            <div class="sub-info-item">
+              <div class="sub-info-label">Аяқталады</div>
+              <div class="sub-info-val">${sub.end}</div>
+            </div>
+            <div class="sub-info-item">
+              <div class="sub-info-label">Қалды</div>
+              <div class="sub-info-val">${sub.daysLeft} күн</div>
+            </div>
+          </div>
+        </div>`;
+    } else {
+      wrap.innerHTML = `
+        <div class="no-sub-card">
+          <div class="no-sub-icon">🎫</div>
+          <div class="no-sub-title">Абонементіңіз жоқ</div>
+          <div class="no-sub-text">Төменде тариф таңдап, бүгін бастаңыз!</div>
+        </div>`;
+    }
+  }
+
+  // ══════════════════════════════════
+  // PLAN SELECT FROM CARD
+  // ══════════════════════════════════
+  function selectPlan(card, name, price) {
+    document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    // Buy modal-да да сет
+    const sel = document.getElementById('buyPlan');
+    for (let opt of sel.options) {
+      if (opt.dataset.name === name) { opt.selected = true; break; }
+    }
+    updateOrderSummary();
+    openModal('buyModal');
+  }
+
+  // ══════════════════════════════════
+  // ORDER SUMMARY UPDATE
+  // ══════════════════════════════════
+  function updateOrderSummary() {
+    const sel = document.getElementById('buyPlan');
+    const price = parseInt(sel.value);
+    const name = sel.options[sel.selectedIndex].dataset.name;
+    const disc = Math.round(price * appliedDiscount / 100);
+    const total = price - disc;
+
+    document.getElementById('summaryPlan').textContent = name;
+    document.getElementById('summaryPrice').textContent = price.toLocaleString() + ' ₸';
+    document.getElementById('summaryTotal').textContent = total.toLocaleString() + ' ₸';
+
+    const discRow = document.getElementById('discountRow');
+    if (appliedDiscount > 0) {
+      discRow.style.display = 'flex';
+      document.getElementById('summaryDiscount').textContent = '-' + disc.toLocaleString() + ' ₸';
+    } else {
+      discRow.style.display = 'none';
+    }
+  }
+
+  // ══════════════════════════════════
+  // PROMO IN BUY MODAL
+  // ══════════════════════════════════
+  function applyPromoInBuy() {
+    const code = document.getElementById('buyPromo').value.trim().toUpperCase();
+    const res = document.getElementById('buyPromoResult');
+    const promo = PROMO_CODES[code];
+    if (promo) {
+      appliedDiscount = promo.discount;
+      appliedPromoCode = code;
+      res.className = 'promo-result success';
+      res.textContent = '✅ ' + promo.label + ' қолданылды!';
+      updateOrderSummary();
+    } else {
+      appliedDiscount = 0;
+      appliedPromoCode = '';
+      res.className = 'promo-result error';
+      res.textContent = '❌ Промокод табылмады немесе жарамсыз';
+      updateOrderSummary();
+    }
+  }
+
+  // ══════════════════════════════════
+  // PROMO MODAL (standalone)
+  // ══════════════════════════════════
+  function activatePromo() {
+    const code = document.getElementById('promoInput').value.trim().toUpperCase();
+    const res = document.getElementById('promoResult');
+    const promo = PROMO_CODES[code];
+
+    if (!code) {
+      res.className = 'promo-result error';
+      res.textContent = '❌ Промокодты енгізіңіз';
+      return;
+    }
+    if (promo) {
+      // Промокодты localStorage-ге сақтау
+      localStorage.setItem('gymix_promo', JSON.stringify({ code, discount: promo.discount, label: promo.label }));
+      res.className = 'promo-result success';
+      res.textContent = '🎉 ' + promo.label + '! Абонемент сатып алғанда автоматты қолданылады.';
+    } else {
+      res.className = 'promo-result error';
+      res.textContent = '❌ Бұл промокод жарамсыз немесе мерзімі өтіп кеткен';
+    }
+  }
+
+  // ══════════════════════════════════
+  // PAYMENT PROCESSING
+  // ══════════════════════════════════
+  function processPay() {
+    const cardNum = document.getElementById('cardNum').value.replace(/\s/g,'');
+    const cardExp = document.getElementById('cardExp').value;
+    const cardCvv = document.getElementById('cardCvv').value;
+    const cardName = document.getElementById('cardName').value.trim();
+
+    if (cardNum.length < 16) { alert('Карта нөмірін дұрыс енгізіңіз'); return; }
+    if (cardExp.length < 5)  { alert('Мерзімді енгізіңіз (MM/YY)'); return; }
+    if (cardCvv.length < 3)  { alert('CVV кодын енгізіңіз'); return; }
+    if (!cardName)            { alert('Карта иесінің атын енгізіңіз'); return; }
+
+    const btn = document.getElementById('payBtn');
+    btn.disabled = true;
+    btn.textContent = '⏳ Өңделуде...';
+
+    setTimeout(() => {
+      const sel = document.getElementById('buyPlan');
+      const price = parseInt(sel.value);
+      const name = sel.options[sel.selectedIndex].dataset.name;
+      const disc = Math.round(price * appliedDiscount / 100);
+      const total = price - disc;
+
+      // Абонементті сақтау
+      const startDate = new Date();
+      const endDate = new Date();
+      endDate.setMonth(endDate.getMonth() + 1);
+
+      const sub = {
+        name,
+        price: total,
+        originalPrice: price,
+        discount: disc,
+        start: formatDate(startDate),
+        end: formatDate(endDate),
+        daysLeft: 30,
+        promoCode: appliedPromoCode || null,
+      };
+
+      const user = getCurrentUser();
+      if (user) {
+        user.subscription = sub;
+        updateUser(user);
+      }
+
+      // Транзакция сақтау
+      saveTransaction({ type: 'buy', ...sub, id: 'TXN' + Date.now() });
+
+      closeModal('buyModal');
+      showReceipt({ ...sub, id: 'TXN' + Date.now() });
+
+      btn.disabled = false;
+      btn.textContent = '💳 Төлеу';
+      appliedDiscount = 0;
+      appliedPromoCode = '';
+    }, 1500);
+  }
+
+  // ══════════════════════════════════
+  // GIFT PROCESSING
+  // ══════════════════════════════════
+  function processGift() {
+    const giftName = document.getElementById('giftName').value.trim();
+    const giftCard = document.getElementById('giftCard').value.replace(/\s/g,'');
+    const giftExp  = document.getElementById('giftExp').value;
+    const giftCvv  = document.getElementById('giftCvv').value;
+    const sel = document.getElementById('giftPlan');
+    const price = parseInt(sel.value);
+    const name = sel.options[sel.selectedIndex].dataset.name;
+
+    if (!giftName) { alert('Алушының атын енгізіңіз'); return; }
+    if (giftCard.length < 16) { alert('Карта нөмірін дұрыс енгізіңіз'); return; }
+    if (giftExp.length < 5)   { alert('Мерзімді енгізіңіз'); return; }
+    if (giftCvv.length < 3)   { alert('CVV кодын енгізіңіз'); return; }
+
+    setTimeout(() => {
+      const startDate = new Date();
+      const endDate = new Date();
+      endDate.setMonth(endDate.getMonth() + 1);
+
+      const txn = { name: name + ' (Сыйлық)', price, discount: 0, start: formatDate(startDate), end: formatDate(endDate), id: 'GIFT' + Date.now() };
+      saveTransaction({ type: 'gift', recipient: giftName, ...txn });
+      closeModal('giftModal');
+      showReceipt({ ...txn, isGift: true, giftName });
+    }, 1200);
+  }
+
+  // ══════════════════════════════════
+  // RECEIPT
+  // ══════════════════════════════════
+  function showReceipt(data) {
+    document.getElementById('rcPlan').textContent = data.name;
+    document.getElementById('rcStart').textContent = data.start;
+    document.getElementById('rcEnd').textContent = data.end;
+    document.getElementById('rcTotal').textContent = data.price.toLocaleString() + ' ₸';
+    document.getElementById('rcId').textContent = 'Транзакция: ' + data.id + ' • ' + new Date().toLocaleString('kk-KZ');
+
+    if (data.discount > 0) {
+      document.getElementById('rcDiscountRow').style.display = 'flex';
+      document.getElementById('rcDiscount').textContent = '-' + data.discount.toLocaleString() + ' ₸';
+    }
+
+    openModal('receiptModal');
+    renderSubCard(); // Абонемент карточкасын жаңарту
+  }
+
+  function printReceipt() {
+    const content = document.getElementById('receiptContent').innerHTML;
+    const w = window.open('', '_blank');
+    w.document.write(`<html><head><title>Gymix Чек</title><style>body{font-family:sans-serif;padding:32px;max-width:400px;margin:0 auto;} *{box-sizing:border-box;}</style></head><body>${content}</body></html>`);
+    w.document.close();
+    w.print();
+  }
+
+  // ══════════════════════════════════
+  // SAVE TRANSACTION
+  // ══════════════════════════════════
+  function saveTransaction(txn) {
+    const txns = JSON.parse(localStorage.getItem('gymix_transactions') || '[]');
+    txns.unshift({ ...txn, date: new Date().toISOString() });
+    localStorage.setItem('gymix_transactions', JSON.stringify(txns));
+  }
+
+  // ══════════════════════════════════
+  // HELPERS
+  // ══════════════════════════════════
+  function formatDate(d) {
+    return d.getDate().toString().padStart(2,'0') + '.' +
+           (d.getMonth()+1).toString().padStart(2,'0') + '.' +
+           d.getFullYear();
+  }
+
+  function formatCard(input) {
+    let v = input.value.replace(/\D/g,'').slice(0,16);
+    input.value = v.match(/.{1,4}/g)?.join(' ') || v;
+  }
+
+  function formatExp(input) {
+    let v = input.value.replace(/\D/g,'').slice(0,4);
+    if (v.length >= 2) v = v.slice(0,2) + '/' + v.slice(2);
+    input.value = v;
+  }
+
+  function openModal(id) { document.getElementById(id).classList.add('show'); }
+  function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+  function closeOnOverlay(e, id) { if (e.target === document.getElementById(id)) closeModal(id); }
+
+  function toggleFaq(btn) {
+    const item = btn.closest('.faq-item');
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  }
+
+  // Header scroll
+  const hdr = document.getElementById('hdr');
+  window.addEventListener('scroll', () => hdr.classList.toggle('scrolled', window.scrollY > 10));
+
+  // Session check
+  function checkSession() {
+    const session = JSON.parse(localStorage.getItem('gymix_session') || 'null');
+    const headerRight = document.getElementById('headerRight');
+    if (!headerRight) return;
+    if (session && session.loggedIn) {
+      const initials = session.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+      const avatarContent = session.avatar ? `<img src="${session.avatar}" alt="avatar">` : initials;
+      headerRight.innerHTML = `
+        <div class="header-user">
+          <a href="profile.html" class="header-avatar">${avatarContent}</a>
+          <a href="profile.html" class="header-username">${session.name}</a>
+          <button class="btn-logout-sm" onclick="logoutUser()">Шығу</button>
+        </div>
+        <a href="subscription.html" class="btn-download">Абонемент алу</a>`;
+    } else {
+      headerRight.innerHTML = `
+        <a href="pages/login.html" class="btn-login">Кіру</a>
+        <a href="subscription.html" class="btn-download">Абонемент алу</a>`;
+    }
+  }
+  function logoutUser() { localStorage.removeItem('gymix_session'); window.location.reload(); }
+
+  // Saved promo check
+  window.addEventListener('DOMContentLoaded', () => {
+    const saved = JSON.parse(localStorage.getItem('gymix_promo') || 'null');
+    if (saved) {
+      appliedDiscount = saved.discount;
+      appliedPromoCode = saved.code;
+      document.getElementById('buyPromo').value = saved.code;
+      document.getElementById('buyPromoResult').className = 'promo-result success';
+      document.getElementById('buyPromoResult').textContent = '✅ ' + saved.label + ' қолданылды!';
+      updateOrderSummary();
+    }
+  });
+</script>
+
+</body>
+</html>
 
