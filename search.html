@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Барлық залдар — Gymix</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://mapgl.2gis.com/api/js/v1"></script>
+  <script src="js/clubs_data.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --purple: #6C5CE7;
+      --purple-dark: #5849c4;
+      --purple-light: #a29bfe;
+      --white: #ffffff;
+      --off-white: #f4f5fb;
+      --dark: #111118;
+      --gray: #888899;
+      --gray-light: #eef0f8;
+      --radius: 20px;
+      --header-h: 56px;
+    }
+    html, body { height: 100%; font-family: 'Noto Sans', sans-serif; background: var(--white); color: var(--dark); overflow: hidden; }
+
+    /* ── HEADER ── */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      height: var(--header-h); display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px;
+      background: rgba(255,255,255,0.96); backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+    .logo { display: flex; align-items: center; text-decoration: none; flex-shrink: 0; }
+    .logo img { height: 48px; object-fit: contain; }
+    nav {
+      display: flex; align-items: center; gap: 4px;
+      position: absolute; left: 50%; transform: translateX(-50%);
+    }
+    nav a {
+      padding: 6px 14px; border-radius: 50px; text-decoration: none;
+      font-size: 13.5px; font-weight: 500; color: #333; transition: all 0.18s; white-space: nowrap;
+    }
+    nav a:hover { background: var(--off-white); color: var(--purple); }
+    nav a.active { color: var(--purple); font-weight: 600; }
+    .header-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    .btn-login {
+      padding: 8px 20px; border-radius: 50px; border: 1.5px solid #ddd; background: transparent;
+      color: #333; font-family: 'Noto Sans', sans-serif; font-size: 13px; font-weight: 600;
+      cursor: pointer; text-decoration: none; transition: all 0.2s;
+    }
+    .btn-login:hover { border-color: var(--purple); color: var(--purple); }
+    .btn-download {
+      padding: 9px 22px; border-radius: 50px; border: none; background: var(--dark);
+      color: white; font-family: 'Noto Sans', sans-serif; font-size: 13px; font-weight: 700;
+      cursor: pointer; text-decoration: none; transition: all 0.2s;
+    }
+    .btn-download:hover { background: var(--purple); transform: translateY(-1px); }
+    .header-user { display: flex; align-items: center; gap: 10px; }
+    .header-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--purple), var(--purple-light));
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 13px; font-weight: 700;
+      overflow: hidden; flex-shrink: 0; cursor: pointer;
+      text-decoration: none; border: 2px solid rgba(108,92,231,0.3);
+    }
+    .header-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .header-username { font-size: 13.5px; font-weight: 600; color: var(--dark); text-decoration: none; transition: color 0.2s; }
+    .header-username:hover { color: var(--purple); }
+    .btn-logout-sm {
+      padding: 8px 16px; border-radius: 50px; border: 1.5px solid #ddd;
+      background: transparent; color: var(--gray);
+      font-family: 'Noto Sans', sans-serif; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn-logout-sm:hover { border-color: #ff4757; color: #ff4757; }
+
+    /* ── MAIN LAYOUT ── */
+    .page-body {
+      display: flex;
+      height: calc(100vh - var(--header-h));
+      margin-top: var(--header-h);
+      overflow: hidden;
+    }
+
+    /* ── LEFT SIDEBAR ── */
+    .sidebar {
+      width: 320px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid #ebebf0;
+      background: var(--white);
+      overflow: hidden;
+      z-index: 10;
+    }
+    .sidebar-top {
+      padding: 14px 14px 0;
+      flex-shrink: 0;
+    }
+    .sidebar-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 16px; font-weight: 800;
+      color: var(--dark); margin-bottom: 10px;
+    }
+    .search-wrap {
+      position: relative; margin-bottom: 10px;
+    }
+    .search-wrap svg {
+      position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+      color: var(--gray); pointer-events: none;
+    }
+    .search-input {
+      width: 100%; padding: 9px 10px 9px 34px;
+      border: 1.5px solid #e0e0ea; border-radius: 12px;
+      font-family: 'Noto Sans', sans-serif; font-size: 13px;
+      color: var(--dark); background: var(--off-white);
+      outline: none; transition: border-color 0.2s;
+    }
+    .search-input:focus { border-color: var(--purple); background: white; }
+    .search-input::placeholder { color: var(--gray); }
+
+    /* Category filters */
+    .filters-row {
+      display: flex; flex-wrap: wrap; gap: 5px;
+      margin-bottom: 10px;
+      max-height: 88px; overflow-y: auto;
+    }
+    .filters-row::-webkit-scrollbar { width: 3px; }
+    .filters-row::-webkit-scrollbar-thumb { background: #ddd; border-radius: 3px; }
+    .filter-chip {
+      display: flex; align-items: center; gap: 4px;
+      padding: 4px 10px; border-radius: 50px;
+      border: 1.5px solid #e0e0ea; background: white;
+      font-family: 'Noto Sans', sans-serif; font-size: 11.5px; font-weight: 600;
+      color: #555; cursor: pointer; transition: all 0.18s; white-space: nowrap;
+    }
+    .filter-chip:hover { border-color: var(--purple); color: var(--purple); }
+    .filter-chip.active { background: var(--purple); border-color: var(--purple); color: white; }
+    .chip-icon { font-size: 12px; }
+    .results-count {
+      font-size: 11.5px; color: var(--gray);
+      padding: 0 0 8px; flex-shrink: 0;
+    }
+    .clubs-list {
+      flex: 1; overflow-y: auto;
+      padding: 0 14px 14px;
+    }
+    .clubs-list::-webkit-scrollbar { width: 4px; }
+    .clubs-list::-webkit-scrollbar-track { background: transparent; }
+    .clubs-list::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
+    .club-card {
+      display: flex; gap: 10px; align-items: flex-start;
+      padding: 10px 0;
+      border-bottom: 1px solid #f0f0f5;
+      cursor: pointer; transition: background 0.15s;
+    }
+    .club-card:hover { background: var(--off-white); margin: 0 -6px; padding: 10px 6px; border-radius: 10px; border-bottom-color: transparent; }
+    .club-card.highlighted { background: #f0eeff; margin: 0 -6px; padding: 10px 6px; border-radius: 10px; border-bottom-color: transparent; }
+    .club-card.active-detail { background: #ede9ff; margin: 0 -6px; padding: 10px 6px; border-radius: 10px; border-bottom-color: transparent; border-left: 3px solid var(--purple); padding-left: 9px; }
+    .club-thumb {
+      width: 62px; height: 62px; border-radius: 10px;
+      object-fit: cover; flex-shrink: 0; background: var(--gray-light);
+    }
+    .club-thumb-placeholder {
+      width: 62px; height: 62px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--gray-light), #dde0ee);
+      flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+    }
+    .club-info { flex: 1; min-width: 0; }
+    .club-name {
+      font-size: 13px; font-weight: 700; color: var(--dark);
+      margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .club-cat {
+      display: inline-flex; align-items: center; gap: 3px;
+      font-size: 10.5px; color: var(--purple); font-weight: 600;
+      background: #f0eeff; border-radius: 6px; padding: 1px 6px;
+      margin-bottom: 3px;
+    }
+    .club-address {
+      font-size: 11.5px; color: var(--gray);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .club-rating {
+      display: flex; align-items: center; gap: 3px;
+      font-size: 11.5px; font-weight: 600; color: #f59e0b;
+      margin-top: 2px;
+    }
+    .no-results {
+      text-align: center; padding: 40px 20px; color: var(--gray);
+    }
+    .no-results-icon { font-size: 32px; margin-bottom: 10px; }
+    .no-results h3 { font-size: 14px; font-weight: 700; margin-bottom: 5px; color: var(--dark); }
+    .no-results p { font-size: 12px; }
+
+    /* ── DETAIL PANEL ── */
+    .detail-panel {
+      width: 0;
+      flex-shrink: 0;
+      overflow: hidden;
+      background: var(--white);
+      border-right: 1px solid #ebebf0;
+      transition: width 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      z-index: 9;
+    }
+    .detail-panel.open {
+      width: 360px;
+    }
+    .detail-inner {
+      width: 360px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .detail-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding-bottom: 20px;
+    }
+    .detail-scroll::-webkit-scrollbar { width: 4px; }
+    .detail-scroll::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
+
+    /* Close button */
+    .detail-close {
+      position: absolute;
+      top: 10px; right: 10px;
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      border: none; background: rgba(0,0,0,0.45); color: white;
+      font-size: 16px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      z-index: 5; transition: background 0.2s;
+    }
+    .detail-close:hover { background: rgba(0,0,0,0.7); }
+
+    /* Photo carousel */
+    .carousel-wrap {
+      position: relative;
+      height: 200px;
+      background: var(--gray-light);
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .carousel-slides {
+      display: flex;
+      height: 100%;
+      transition: transform 0.35s ease;
+    }
+    .carousel-slide {
+      min-width: 100%;
+      height: 100%;
+    }
+    .carousel-slide img {
+      width: 100%; height: 100%; object-fit: cover;
+    }
+    .carousel-placeholder {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 52px;
+      background: linear-gradient(135deg, #e8e8f0, #d0d0e8);
+    }
+    .carousel-btn {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 30px; height: 30px; border-radius: 50%;
+      border: none; background: rgba(255,255,255,0.85);
+      color: var(--dark); font-size: 14px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      z-index: 3; box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      transition: all 0.2s;
+    }
+    .carousel-btn:hover { background: white; transform: translateY(-50%) scale(1.1); }
+    .carousel-btn.prev { left: 8px; }
+    .carousel-btn.next { right: 8px; }
+    .carousel-dots {
+      position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 5px; z-index: 3;
+    }
+    .carousel-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: rgba(255,255,255,0.5);
+      cursor: pointer; transition: background 0.2s;
+    }
+    .carousel-dot.active { background: white; }
+    .carousel-count {
+      position: absolute; bottom: 8px; right: 10px;
+      font-size: 11px; color: white;
+      background: rgba(0,0,0,0.4); border-radius: 10px;
+      padding: 2px 7px; z-index: 3;
+    }
+
+    /* Detail body */
+    .detail-body {
+      padding: 16px 16px 0;
+    }
+    .detail-header {
+      margin-bottom: 10px;
+    }
+    .detail-name {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 18px; font-weight: 800;
+      color: var(--dark); margin-bottom: 6px;
+      line-height: 1.2;
+    }
+    .detail-meta {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+    .detail-rating-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px; border-radius: 20px;
+      background: linear-gradient(135deg, #f59e0b, #f97316);
+      color: white; font-size: 13px; font-weight: 800;
+    }
+    .detail-cat-tag {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px; border-radius: 20px;
+      background: #f0eeff; color: var(--purple);
+      font-size: 12px; font-weight: 700;
+    }
+    .detail-address {
+      display: flex; align-items: flex-start; gap: 5px;
+      font-size: 12.5px; color: var(--gray); margin-bottom: 6px;
+    }
+    .detail-address a {
+      color: #0984e3; text-decoration: none; font-weight: 600;
+    }
+    .detail-address a:hover { text-decoration: underline; }
+
+    /* Divider */
+    .detail-divider {
+      height: 1px; background: #f0f0f5; margin: 12px 0;
+    }
+
+    /* Description */
+    .detail-section-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px; font-weight: 800; color: var(--dark);
+      margin-bottom: 7px;
+    }
+    .detail-desc {
+      font-size: 12.5px; color: #444; line-height: 1.6;
+    }
+    .detail-desc.collapsed {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .detail-more-btn {
+      background: none; border: none; color: var(--purple);
+      font-size: 12px; font-weight: 700; cursor: pointer;
+      padding: 4px 0; font-family: 'Noto Sans', sans-serif;
+    }
+    .detail-more-btn:hover { text-decoration: underline; }
+
+    /* Subscribe button */
+    .btn-subscribe {
+      display: block; width: calc(100% - 32px);
+      margin: 14px 16px 0;
+      padding: 14px; border-radius: 14px;
+      border: none; background: var(--purple);
+      color: white; font-family: 'Montserrat', sans-serif;
+      font-size: 14px; font-weight: 800;
+      cursor: pointer; text-align: center;
+      text-decoration: none; transition: all 0.2s;
+      box-shadow: 0 4px 16px rgba(108,92,231,0.35);
+    }
+    .btn-subscribe:hover { background: var(--purple-dark); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(108,92,231,0.45); }
+
+    /* 2GIS link */
+    .detail-gis-btn {
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      width: calc(100% - 32px); margin: 8px 16px 0;
+      padding: 10px; border-radius: 12px;
+      border: 1.5px solid #e0e0ea; background: white;
+      color: #333; font-family: 'Noto Sans', sans-serif;
+      font-size: 13px; font-weight: 600;
+      cursor: pointer; text-decoration: none; transition: all 0.2s;
+    }
+    .detail-gis-btn:hover { border-color: #0984e3; color: #0984e3; }
+
+    /* Amenities */
+    .amenities-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .amenity-item {
+      display: flex; align-items: center; gap: 9px;
+      padding: 8px 10px; border-radius: 10px;
+      background: #f8f8fc;
+      font-size: 12px; font-weight: 600; color: #333;
+    }
+    .amenity-item.missing {
+      opacity: 0.35;
+      background: #f4f4f7;
+    }
+    .amenity-icon {
+      width: 30px; height: 30px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .amenity-item:not(.missing) .amenity-icon {
+      background: linear-gradient(135deg, var(--purple), var(--purple-light));
+    }
+    .amenity-item.missing .amenity-icon {
+      background: #e0e0e8;
+    }
+    .amenity-icon svg { width: 16px; height: 16px; }
+    .amenity-item:not(.missing) .amenity-icon svg { color: white; }
+    .amenity-item.missing .amenity-icon svg { color: #aaa; }
+
+    /* Mini map */
+    .mini-map-wrap {
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1.5px solid #e8e8f0;
+      height: 180px;
+      position: relative;
+    }
+    .mini-map {
+      width: 100%; height: 100%;
+    }
+
+    /* ── MAP ── */
+    #map {
+      flex: 1; height: 100%; z-index: 1;
+    }
+
+    /* 2GIS popup */
+    .popup-content { min-width: 200px; font-family: 'Noto Sans', sans-serif; }
+    .popup-name { font-family: 'Montserrat', sans-serif; font-size: 14px; font-weight: 800; margin-bottom: 4px; color: var(--dark); }
+    .popup-cat { font-size: 11px; color: var(--purple); font-weight: 600; margin-bottom: 4px; }
+    .popup-addr { font-size: 12px; color: #666; margin-bottom: 8px; }
+    .popup-rating { font-size: 12px; color: #f59e0b; font-weight: 600; }
+    .popup-btn {
+      display: inline-block; margin-top: 8px;
+      padding: 6px 16px; border-radius: 50px;
+      background: var(--purple); color: white;
+      font-size: 12px; font-weight: 700;
+      text-decoration: none; cursor: pointer;
+      border: none; font-family: 'Noto Sans', sans-serif;
+    }
+    .mapgl-popup__content { padding: 14px 16px !important; border-radius: 16px !important; box-shadow: 0 8px 32px rgba(0,0,0,0.15) !important; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      html, body { overflow: auto; }
+      .page-body { flex-direction: column; height: auto; overflow: auto; }
+      .sidebar { width: 100%; border-right: none; border-bottom: 1px solid #ebebf0; max-height: 50vh; }
+      .detail-panel { display: none; }
+      #map { height: 50vh; flex: none; }
+      nav { display: none; }
+      header { padding: 0 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header id="hdr">
+  <a href="index.html" class="logo">
+    <img src="images/logo/gymix-logo.png" alt="Gymix">
+  </a>
+  <nav>
+    <a href="index.html">Басты бет</a>
+    <a href="search.html" class="active">Барлық залдар</a>
+    <a href="subscription.html">Абонемент</a>
+    <a href="extra.html">Extra</a>
+    <a href="profile.html">Профиль</a>
+    <a href="about.html">Біз туралы</a>
+  </nav>
+  <div class="header-right" id="headerRight">
+    <a href="pages/login.html" class="btn-login">Кіру</a>
+    <a href="subscription.html" class="btn-download">Абонемент алу</a>
+  </div>
+</header>
+
+<!-- MAIN -->
+<div class="page-body">
+
+  <!-- LEFT SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="sidebar-title">Спорт залдарды іздеу</div>
+      <div class="search-wrap">
+        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+        </svg>
+        <input class="search-input" id="searchInput" type="text" placeholder="Зал атауы немесе мекенжай...">
+      </div>
+      <div class="filters-row" id="filtersRow">
+        <button class="filter-chip active" data-cat="all"><span class="chip-icon">🏆</span> Барлығы</button>
+        <button class="filter-chip" data-cat="gym"><span class="chip-icon">💪</span> Спорт залы</button>
+        <button class="filter-chip" data-cat="fitness"><span class="chip-icon">🏋️</span> Фитнес</button>
+        <button class="filter-chip" data-cat="group"><span class="chip-icon">🎯</span> Топтық студия</button>
+        <button class="filter-chip" data-cat="swimming"><span class="chip-icon">🏊</span> Жүзу</button>
+        <button class="filter-chip" data-cat="yoga"><span class="chip-icon">🧘</span> Йога</button>
+        <button class="filter-chip" data-cat="stretching"><span class="chip-icon">🤸</span> Пилатес</button>
+        <button class="filter-chip" data-cat="intensive"><span class="chip-icon">⚡</span> Қарқынды</button>
+        <button class="filter-chip" data-cat="martial"><span class="chip-icon">🥊</span> Жекпе-жек</button>
+        <button class="filter-chip" data-cat="dance"><span class="chip-icon">💃</span> Би студиясы</button>
+        <button class="filter-chip" data-cat="bath"><span class="chip-icon">♨️</span> Монша / СПА</button>
+        <button class="filter-chip" data-cat="massage"><span class="chip-icon">💆</span> Массаж</button>
+        <button class="filter-chip" data-cat="archery"><span class="chip-icon">🏹</span> Садақ ату</button>
+        <button class="filter-chip" data-cat="analysis"><span class="chip-icon">🔬</span> Дене анализі</button>
+        <button class="filter-chip" data-cat="outdoor"><span class="chip-icon">⛸️</span> Ауадағы алаң</button>
+        <button class="filter-chip" data-cat="tabletennis"><span class="chip-icon">🏓</span> Үстел теннисі</button>
+        <button class="filter-chip" data-cat="equipment"><span class="chip-icon">🛒</span> Спорт дүкені</button>
+      </div>
+      <div class="results-count" id="resultsCount">Жүктелуде...</div>
+    </div>
+    <div class="clubs-list" id="clubsList"></div>
+  </aside>
+
+  <!-- DETAIL PANEL -->
+  <div class="detail-panel" id="detailPanel">
+    <div class="detail-inner">
+      <!-- Carousel -->
+      <div class="carousel-wrap" id="carouselWrap">
+        <div class="carousel-slides" id="carouselSlides"></div>
+        <button class="carousel-btn prev" id="carouselPrev" onclick="carouselStep(-1)">&#8592;</button>
+        <button class="carousel-btn next" id="carouselNext" onclick="carouselStep(1)">&#8594;</button>
+        <div class="carousel-dots" id="carouselDots"></div>
+        <div class="carousel-count" id="carouselCount"></div>
+        <button class="detail-close" onclick="closeDetail()">&#10005;</button>
+      </div>
+
+      <!-- Detail scroll content -->
+      <div class="detail-scroll">
+        <div class="detail-body">
+          <div class="detail-header">
+            <div class="detail-name" id="detailName"></div>
+            <div class="detail-meta" id="detailMeta"></div>
+            <div class="detail-address" id="detailAddress"></div>
+          </div>
+        </div>
+
+        <a class="btn-subscribe" id="detailSubscribe" href="subscription.html">
+          Абонемент алу →
+        </a>
+        <a class="detail-gis-btn" id="detailGisBtn" href="#" target="_blank">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          2GIS-те ашу
+        </a>
+
+        <div class="detail-body" style="padding-top:14px">
+          <div id="detailDescSection"></div>
+        </div>
+
+        <!-- Amenities section -->
+        <div class="detail-body" style="padding-top:6px">
+          <div id="detailAmenities"></div>
+        </div>
+
+        <!-- Mini map section -->
+        <div class="detail-body" style="padding-top:6px; padding-bottom:16px">
+          <div class="detail-section-title">📍 Орналасуы</div>
+          <div id="miniMapWrap" class="mini-map-wrap">
+            <div id="miniMap" class="mini-map"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAP -->
+  <div id="map"></div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+// КАТЕГОРИЯ ТҮСТЕРІ
+// ══════════════════════════════════════════
+const CAT_COLORS = {
+  gym:         '#6C5CE7',
+  fitness:     '#a29bfe',
+  group:       '#00cec9',
+  swimming:    '#0984e3',
+  yoga:        '#00b894',
+  stretching:  '#fd79a8',
+  intensive:   '#e17055',
+  martial:     '#d63031',
+  dance:       '#e84393',
+  bath:        '#74b9ff',
+  massage:     '#81ecec',
+  archery:     '#636e72',
+  analysis:    '#6c5ce7',
+  equipment:   '#b2bec3',
+  outdoor:     '#55efc4',
+  tabletennis: '#fdcb6e'
+};
+
+const YOUR_2GIS_KEY = '65abad1d-4957-496b-98b3-67c7042b8713';
+
+const map = new mapgl.Map('map', {
+  center: [71.4344, 51.1294],
+  zoom: 12,
+  key: YOUR_2GIS_KEY
+});
+
+function makeSvgUrl(cat, highlighted) {
+  const color = CAT_COLORS[cat] || '#6C5CE7';
+  const s = highlighted ? 38 : 32;
+  const svg = `<svg width="${s}" height="${s}" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="16" cy="14" r="12" fill="${color}" stroke="white" stroke-width="2.5"/>
+    <polygon points="16,28 10,20 22,20" fill="${color}"/>
+    <circle cx="16" cy="14" r="5" fill="white" opacity="0.9"/>
+  </svg>`;
+  return 'data:image/svg+xml,' + encodeURIComponent(svg);
+}
+
+// ══════════════════════════════════════════
+// СТАН
+// ══════════════════════════════════════════
+let activeCategory = 'all';
+let searchQuery = '';
+let markerObjs = {};
+let activePopup = null;
+let activeMarkerId = null;
+let activeDetailId = null;
+
+// Mini map
+let miniMap = null;
+let miniMarker = null;
+
+// ══════════════════════════════════════════
+// УДОБСТВА ИКОНКАЛАРЫ (inline SVG)
+// ══════════════════════════════════════════
+const AMENITY_DATA = {
+  shower:   { kk: "Душ бөлмесі",    svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0 1 8-8"/><path d="M12 4a8 8 0 0 1 8 8"/><line x1="12" y1="12" x2="12" y2="20"/><line x1="8" y1="20" x2="16" y2="20"/><circle cx="12" cy="5" r="1" fill="currentColor"/><line x1="12" y1="12" x2="4" y2="20" stroke-width="1.5"/></svg>' },
+  locker:   { kk: "Шкаф / Киінетін", svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="2" width="18" height="20" rx="2"/><line x1="12" y1="2" x2="12" y2="22"/><circle cx="9" cy="12" r="1" fill="currentColor"/><circle cx="15" cy="12" r="1" fill="currentColor"/></svg>' },
+  trainer:  { kk: "Кәсіби тренер",  svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M5.5 20h13"/><path d="M8 20v-4a4 4 0 0 1 8 0v4"/></svg>' },
+  cardio:   { kk: "Кардио техника", svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>' },
+  music:    { kk: "Залда музыка",   svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>' },
+  parking:  { kk: "Автотұрақ",      svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 17V7h4a3 3 0 0 1 0 6H9"/></svg>' },
+  wifi:     { kk: "Тегін Wi-Fi",    svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1" fill="currentColor"/></svg>' },
+  sauna:    { kk: "Сауна / Монша",  svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6c0-1.1.9-2 2-2s2 .9 2 2-.9 3-2 3S8 7.1 8 6z"/><path d="M4 20c0-4 2-7 8-7s8 3 8 7"/><path d="M17 8c.6-1 1.8-1.5 3-1"/><path d="M17 12c.6-1 1.8-1.5 3-1"/></svg>' },
+  pool:     { kk: "Жүзу бассейні",  svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12c1.5 0 3-1 3-2.5S3.5 7 2 7"/><path d="M22 12c-1.5 0-3-1-3-2.5S20.5 7 22 7"/><path d="M2 17c2 0 3.5-1 5-1s3 1 5 1 3-1 5-1 3 1 5 1"/><path d="M2 21c2 0 3.5-1 5-1s3 1 5 1 3-1 5-1 3 1 5 1"/><path d="M8 3l4 4 4-4"/></svg>' },
+  water:    { kk: "Ауыз су",        svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6 9 4 13.5 4 16a8 8 0 0 0 16 0c0-2.5-2-7-8-14z"/></svg>' },
+  ac:       { kk: "Кондиционер",    svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="8" rx="2"/><path d="M8 18h1M12 18v2M16 18h1"/><path d="M6 10h12"/></svg>' },
+  towels:   { kk: "Тегін сүлгі",   svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="4" rx="1"/><path d="M4 7v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7"/><path d="M9 13h6"/></svg>' },
+  prayer:   { kk: "Намазхана",      svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>' },
+  tea:      { kk: "Тегін шай",      svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V8z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg>' },
+  hairdryer:{ kk: "Фен",            svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8a5 5 0 0 0-10 0c0 3 2 5 5 8"/><line x1="12" y1="16" x2="12" y2="22"/><line x1="9" y1="19" x2="15" y2="19"/><path d="M21 3L9 9"/></svg>' },
+  metro:    { kk: "Метро жақын",    svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M7 17v4"/><path d="M17 17v4"/><path d="M7 10l3-5 2 4 2-4 3 5"/></svg>' },
+  kids:     { kk: "Балалар бөлмесі",svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M9 22v-4l-2-2v-3a5 5 0 0 1 10 0v3l-2 2v4"/></svg>' },
+  cafe:     { kk: "Кафе / Буфет",   svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>' },
+};
+
+// Удобства бөлімін render ету
+function renderAmenities(amenities) {
+  const el = document.getElementById('detailAmenities');
+  if (!el) return;
+
+  // Бар удобстволар жоқ болса
+  if (!amenities || amenities.length === 0) {
+    el.innerHTML = '';
+    return;
+  }
+
+  // Барлық белгілі удобстволарды тізімде шығару (бары ✅, жоғы ✗ сұр)
+  const allKeys = Object.keys(AMENITY_DATA);
+  const hasSet = new Set(amenities);
+
+  const items = allKeys.map(key => {
+    const d = AMENITY_DATA[key];
+    const has = hasSet.has(key);
+    return `<div class="amenity-item${has ? '' : ' missing'}">
+      <div class="amenity-icon">${d.svg}</div>
+      <span>${d.kk}</span>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `<div class="detail-section-title" style="margin-top:4px">Қызметтер мен мүмкіндіктер</div>
+    <div class="amenities-grid">${items}</div>`;
+}
+
+// Carousel state
+let carouselIndex = 0;
+let carouselPhotos = [];
+
+function popupHtml(club) {
+  return `<div class="popup-content">
+    <div class="popup-name">${club.name}</div>
+    <div class="popup-cat">${club.catIcon} ${club.catLabel}</div>
+    <div class="popup-addr">📍 ${club.address || 'Астана'}</div>
+    <div class="popup-rating">★ ${club.rating}</div>
+    <button class="popup-btn" onclick="openDetail(${club.id})">Толығырақ →</button>
+  </div>`;
+}
+
+function openPopup(club) {
+  try {
+    if (activePopup) { activePopup.destroy(); activePopup = null; }
+    activePopup = new mapgl.Popup(map, {
+      coordinates: [club.lng, club.lat],
+      html: popupHtml(club),
+      offset: [0, -34]
+    });
+  } catch(e) { /* mapgl.Popup қолжетімсіз болса елемей өту */ }
+}
+
+function addMarker(club) {
+  const m = new mapgl.Marker(map, {
+    coordinates: [club.lng, club.lat],
+    icon: makeSvgUrl(club.cat, false),
+    size: [32, 32],
+    anchor: [0.5, 1]
+  });
+  m.on('click', () => {
+    highlightCard(club.id);
+    openDetail(club.id);
+    openPopup(club);
+  });
+  markerObjs[club.id] = m;
+}
+
+CLUBS.forEach(club => addMarker(club));
+
+// ══════════════════════════════════════════
+// CAROUSEL
+// ══════════════════════════════════════════
+function buildCarousel(photos, catIcon) {
+  carouselPhotos = photos && photos.length > 0 ? photos : [];
+  carouselIndex = 0;
+  const slides = document.getElementById('carouselSlides');
+  const dots = document.getElementById('carouselDots');
+  const count = document.getElementById('carouselCount');
+  const prevBtn = document.getElementById('carouselPrev');
+  const nextBtn = document.getElementById('carouselNext');
+
+  if (carouselPhotos.length === 0) {
+    slides.innerHTML = `<div class="carousel-slide"><div class="carousel-placeholder">${catIcon}</div></div>`;
+    dots.innerHTML = '';
+    count.textContent = '';
+    prevBtn.style.display = 'none';
+    nextBtn.style.display = 'none';
+    return;
+  }
+
+  slides.innerHTML = carouselPhotos.map(p =>
+    `<div class="carousel-slide"><img src="${p}" alt="" onerror="this.parentElement.innerHTML='<div class=\\'carousel-placeholder\\'>${catIcon}</div>'"></div>`
+  ).join('');
+
+  if (carouselPhotos.length > 1) {
+    dots.innerHTML = carouselPhotos.map((_, i) =>
+      `<div class="carousel-dot${i === 0 ? ' active' : ''}" onclick="goCarousel(${i})"></div>`
+    ).join('');
+    count.textContent = `1 / ${carouselPhotos.length}`;
+    prevBtn.style.display = '';
+    nextBtn.style.display = '';
+  } else {
+    dots.innerHTML = '';
+    count.textContent = '';
+    prevBtn.style.display = 'none';
+    nextBtn.style.display = 'none';
+  }
+  updateCarouselPos();
+}
+
+function updateCarouselPos() {
+  const slides = document.getElementById('carouselSlides');
+  slides.style.transform = `translateX(-${carouselIndex * 100}%)`;
+  const allDots = document.querySelectorAll('.carousel-dot');
+  allDots.forEach((d, i) => d.classList.toggle('active', i === carouselIndex));
+  const count = document.getElementById('carouselCount');
+  if (carouselPhotos.length > 1) count.textContent = `${carouselIndex + 1} / ${carouselPhotos.length}`;
+}
+
+function carouselStep(dir) {
+  if (carouselPhotos.length <= 1) return;
+  carouselIndex = (carouselIndex + dir + carouselPhotos.length) % carouselPhotos.length;
+  updateCarouselPos();
+}
+
+function goCarousel(i) {
+  carouselIndex = i;
+  updateCarouselPos();
+}
+
+// ══════════════════════════════════════════
+// ДЕТАЙЛ ПАНЕЛЬ
+// ══════════════════════════════════════════
+function openDetail(id) {
+  const club = CLUBS.find(c => c.id === id);
+  if (!club) return;
+
+  activeDetailId = id;
+
+  // Карточкаларды белгілеу
+  document.querySelectorAll('.club-card').forEach(c => c.classList.remove('active-detail'));
+  const card = document.getElementById('card-' + id);
+  if (card) { card.classList.add('active-detail'); card.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+
+  // Carousel
+  buildCarousel(club.photos, club.catIcon);
+
+  // Атауы
+  document.getElementById('detailName').textContent = club.name;
+
+  // Мета
+  const metaEl = document.getElementById('detailMeta');
+  metaEl.innerHTML = `
+    <div class="detail-rating-badge">★ ${club.rating}</div>
+    <div class="detail-cat-tag">${club.catIcon} ${club.catLabel}</div>`;
+
+  // Мекенжай
+  const addrEl = document.getElementById('detailAddress');
+  if (club.address) {
+    const gisLink = club.gisUrl
+      ? `<a href="${club.gisUrl}" target="_blank">${club.address}</a>`
+      : club.address;
+    addrEl.innerHTML = `<span>📍</span><span>${gisLink}</span>`;
+  } else {
+    addrEl.innerHTML = `<span>📍</span><span style="color:#aaa">Астана</span>`;
+  }
+
+  // 2GIS батырмасы
+  const gisBtn = document.getElementById('detailGisBtn');
+  if (club.gisUrl) {
+    gisBtn.href = club.gisUrl;
+    gisBtn.style.display = '';
+  } else {
+    gisBtn.style.display = 'none';
+  }
+
+  // Удобства
+  renderAmenities(club.amenities);
+
+  // Сипаттама
+  const descSection = document.getElementById('detailDescSection');
+  if (club.description) {
+    const lines = club.description.trim().split('\n').filter(Boolean);
+    const fullText = lines.join('<br>');
+    descSection.innerHTML = `
+      <div class="detail-section-title">Зал туралы</div>
+      <div class="detail-desc collapsed" id="descText">${fullText}</div>
+      <button class="detail-more-btn" id="descMoreBtn" onclick="toggleDesc()">Толығырақ оқу ↓</button>`;
+  } else {
+    descSection.innerHTML = '';
+  }
+
+  // Панельді ашу
+  document.getElementById('detailPanel').classList.add('open');
+
+  // Мини картаны кешіктіріп жүктеу (panel animation аяқталғаннан кейін)
+  setTimeout(() => initMiniMap(club.lat, club.lng, club.catIcon, club.cat), 320);
+}
+
+function initMiniMap(lat, lng, catIcon, cat) {
+  const container = document.getElementById('miniMap');
+  if (!container) return;
+
+  // Бұрынғы маркерді жою
+  if (miniMarker) { try { miniMarker.destroy(); } catch(e) {} miniMarker = null; }
+
+  if (miniMap) {
+    // Карта бар — тек орталықты жылжыту
+    try {
+      miniMap.setCenter([lng, lat], { animate: true });
+      miniMap.setZoom(16, { animate: true });
+      // Жаңа маркер
+      const color = CAT_COLORS[cat] || '#6C5CE7';
+      miniMarker = new mapgl.Marker(miniMap, {
+        coordinates: [lng, lat],
+        icon: makeSvgUrl(cat, true),
+        size: [38, 38],
+        anchor: [0.5, 1]
+      });
+    } catch(e) {}
+    return;
+  }
+
+  try {
+    miniMap = new mapgl.Map('miniMap', {
+      center: [lng, lat],
+      zoom: 16,
+      key: YOUR_2GIS_KEY,
+      controls: []
+    });
+    miniMap.on('load', () => {
+      try {
+        miniMarker = new mapgl.Marker(miniMap, {
+          coordinates: [lng, lat],
+          icon: makeSvgUrl(cat, true),
+          size: [38, 38],
+          anchor: [0.5, 1]
+        });
+      } catch(e) {}
+    });
+  } catch(e) {
+    // 2GIS қолжетімсіз болса — Google Maps статикалық сурет
+    container.innerHTML = `<a href="https://www.google.com/maps?q=${lat},${lng}" target="_blank" style="display:block;height:100%;background:#e8eaf0;display:flex;align-items:center;justify-content:center;text-decoration:none;color:#555;font-size:13px;font-weight:600;gap:8px">
+      <span style="font-size:24px">📍</span> Картада ашу
+    </a>`;
+  }
+}
+
+function closeDetail() {
+  document.getElementById('detailPanel').classList.remove('open');
+  document.querySelectorAll('.club-card').forEach(c => c.classList.remove('active-detail'));
+  activeDetailId = null;
+}
+
+function toggleDesc() {
+  const el = document.getElementById('descText');
+  const btn = document.getElementById('descMoreBtn');
+  if (el.classList.contains('collapsed')) {
+    el.classList.remove('collapsed');
+    btn.textContent = 'Жабу ↑';
+  } else {
+    el.classList.add('collapsed');
+    btn.textContent = 'Толығырақ оқу ↓';
+  }
+}
+
+// ══════════════════════════════════════════
+// ФИЛЬТР + ІЗДЕУ
+// ══════════════════════════════════════════
+function getFiltered() {
+  return CLUBS.filter(c => {
+    const matchCat = activeCategory === 'all' || c.cat === activeCategory;
+    const q = searchQuery.toLowerCase();
+    const matchSearch = !q || c.name.toLowerCase().includes(q) || (c.address || '').toLowerCase().includes(q);
+    return matchCat && matchSearch;
+  });
+}
+
+function renderList() {
+  const filtered = getFiltered();
+  const list = document.getElementById('clubsList');
+  const count = document.getElementById('resultsCount');
+  count.textContent = filtered.length + ' зал табылды';
+
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="no-results">
+      <div class="no-results-icon">🔍</div>
+      <h3>Зал табылмады</h3>
+      <p>Басқа сүзгі немесе іздеу сөзін қолданып көріңіз</p>
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = filtered.map(club => {
+    const thumb = club.img
+      ? `<img class="club-thumb" src="${club.img}" alt="${club.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+      : '';
+    const placeholder = `<div class="club-thumb-placeholder" ${club.img ? 'style="display:none"' : ''}>${club.catIcon}</div>`;
+    return `
+      <div class="club-card${activeDetailId === club.id ? ' active-detail' : ''}" id="card-${club.id}" onclick="focusClub(${club.id})">
+        ${thumb}${placeholder}
+        <div class="club-info">
+          <div class="club-name">${club.name}</div>
+          <div class="club-cat">${club.catIcon} ${club.catLabel}</div>
+          <div class="club-address">📍 ${club.address || 'Астана'}</div>
+          <div class="club-rating">★ <span style="color:#666;font-weight:400;font-size:11px">${club.rating}</span></div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function updateMarkers() {
+  const filteredIds = new Set(getFiltered().map(c => c.id));
+  CLUBS.forEach(club => {
+    const exists = !!markerObjs[club.id];
+    if (filteredIds.has(club.id) && !exists) {
+      addMarker(club);
+    } else if (!filteredIds.has(club.id) && exists) {
+      markerObjs[club.id].destroy();
+      delete markerObjs[club.id];
+    }
+  });
+}
+
+function applyFilters() {
+  renderList();
+  updateMarkers();
+}
+
+// ══════════════════════════════════════════
+// ФОКУС ПРИ КЛИКЕ
+// ══════════════════════════════════════════
+function focusClub(id) {
+  const club = CLUBS.find(c => c.id === id);
+  if (!club) return;
+  highlightCard(id);
+  openDetail(id);
+  map.setCenter([club.lng, club.lat], { animate: true });
+  map.setZoom(15, { animate: true });
+}
+
+function highlightCard(id) {
+  if (activeMarkerId) {
+    const prev = document.getElementById('card-' + activeMarkerId);
+    if (prev) prev.classList.remove('highlighted');
+    if (markerObjs[activeMarkerId]) {
+      const prevClub = CLUBS.find(c => c.id === activeMarkerId);
+      if (prevClub) markerObjs[activeMarkerId].setIcon(makeSvgUrl(prevClub.cat, false));
+    }
+  }
+  activeMarkerId = id;
+  const card = document.getElementById('card-' + id);
+  if (card) { card.classList.add('highlighted'); card.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+  if (markerObjs[id]) {
+    const club = CLUBS.find(c => c.id === id);
+    if (club) markerObjs[id].setIcon(makeSvgUrl(club.cat, true));
+  }
+}
+
+// ══════════════════════════════════════════
+// ОҚИҒАЛАР
+// ══════════════════════════════════════════
+document.getElementById('filtersRow').addEventListener('click', e => {
+  const chip = e.target.closest('.filter-chip');
+  if (!chip) return;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  chip.classList.add('active');
+  activeCategory = chip.dataset.cat;
+  closeDetail();
+  applyFilters();
+});
+
+document.getElementById('searchInput').addEventListener('input', e => {
+  searchQuery = e.target.value;
+  applyFilters();
+});
+
+// URL param
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  const cat = params.get('cat');
+  if (cat) {
+    activeCategory = cat;
+    document.querySelectorAll('.filter-chip').forEach(c => {
+      c.classList.toggle('active', c.dataset.cat === cat);
+    });
+  }
+})();
+
+applyFilters();
+
+// ══════════════════════════════════════════
+// СЕССИЯ
+// ══════════════════════════════════════════
+function checkSession() {
+  const session = JSON.parse(localStorage.getItem('gymix_session') || 'null');
+  const headerRight = document.getElementById('headerRight');
+  if (!headerRight) return;
+  if (session && session.loggedIn) {
+    const initials = session.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+    const avatarContent = session.avatar ? `<img src="${session.avatar}" alt="avatar">` : initials;
+    headerRight.innerHTML = `
+      <div class="header-user">
+        <a href="profile.html" class="header-avatar">${avatarContent}</a>
+        <a href="profile.html" class="header-username">${session.name}</a>
+        <button class="btn-logout-sm" onclick="logoutUser()">Шығу</button>
+      </div>
+      <a href="subscription.html" class="btn-download">Абонемент алу</a>`;
+  } else {
+    headerRight.innerHTML = `
+      <a href="pages/login.html" class="btn-login">Кіру</a>
+      <a href="subscription.html" class="btn-download">Абонемент алу</a>`;
+  }
+}
+function logoutUser() { localStorage.removeItem('gymix_session'); location.reload(); }
+checkSession();
+</script>
+</body>
+</html>
