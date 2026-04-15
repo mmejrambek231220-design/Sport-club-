@@ -172,6 +172,18 @@
       font-size: 20px;
     }
     .club-info { flex: 1; min-width: 0; }
+    .club-save-btn {
+      flex-shrink: 0; align-self: center;
+      width: 32px; height: 32px; border-radius: 50%;
+      border: none; background: transparent;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      color: #d0d0e0; transition: all 0.2s; padding: 0; margin-left: 2px;
+    }
+    .club-save-btn:hover { color: #ff6b9d; background: #fff0f5; transform: scale(1.1); }
+    .club-save-btn.saved { color: #ff6b9d; }
+    .club-save-btn.saved:hover { color: #e0557f; }
+    .club-save-btn svg { width: 17px; height: 17px; transition: transform 0.15s; }
+    .club-save-btn.saved svg { transform: scale(1.15); }
     .club-name {
       font-size: 13px; font-weight: 700; color: var(--dark);
       margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -772,6 +784,12 @@
           </svg>
           <span class="filter-badge" id="filterBadge" style="display:none">0</span>
         </button>
+        <button class="filter-open-btn" id="savedFilterBtn" onclick="toggleSavedFilter()" title="Сақталған залдар">
+          <svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          </svg>
+          <span class="filter-badge" id="savedBadge" style="display:none">0</span>
+        </button>
       </div>
 
       <!-- ── ЖАК. МЕКЕНЖАЙ: ҮЙ / ЖҰМЫС ── -->
@@ -953,6 +971,8 @@ function makeSvgUrl(cat, highlighted) {
 let activeCats = new Set();      // filter panel categories (empty = барлығы)
 let activeAmenities = new Set(); // filter panel amenities
 let womenOnly = false;           // filter panel women toggle
+let savedClubs = new Set(JSON.parse(localStorage.getItem('gymix_saved') || '[]'));
+let showSavedOnly = false;
 let searchQuery = '';
 let markerObjs = {};
 let activePopup = null;
@@ -1269,6 +1289,8 @@ const LOC_RADIUS_KM = 1;
 
 function getFiltered() {
   return CLUBS.filter(c => {
+    // Сақталған ғана
+    if (showSavedOnly && !savedClubs.has(c.id)) return false;
     // Категория
     if (activeCats.size > 0 && !activeCats.has(c.cat)) return false;
     // Іздеу
@@ -1343,6 +1365,8 @@ function renderList() {
       if (badges.length) distHtml = `<div class="dist-badges">${badges.join('')}</div>`;
     }
 
+    const isSaved = savedClubs.has(club.id);
+    const heartFill = isSaved ? 'fill="#ff6b9d" stroke="#ff6b9d"' : 'fill="none"';
     return `
       <div class="club-card${activeDetailId === club.id ? ' active-detail' : ''}" id="card-${club.id}" onclick="focusClub(${club.id})">
         ${thumb}${placeholder}
@@ -1353,6 +1377,11 @@ function renderList() {
           <div class="club-rating">★ <span style="color:#666;font-weight:400;font-size:11px">${club.rating}</span></div>
           ${distHtml}
         </div>
+        <button class="club-save-btn${isSaved ? ' saved' : ''}" onclick="toggleSave(event,${club.id})" title="${isSaved ? 'Сақталған' : 'Сақтау'}">
+          <svg viewBox="0 0 24 24" ${heartFill} stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          </svg>
+        </button>
       </div>`;
   }).join('');
 }
@@ -1541,6 +1570,46 @@ function updateFilterBadge() {
     btn.classList.remove('has-filters');
   }
 }
+// ── САҚТАЛҒАН ЗАЛДАР ──
+function toggleSave(e, id) {
+  e.stopPropagation();
+  if (savedClubs.has(id)) savedClubs.delete(id);
+  else savedClubs.add(id);
+  localStorage.setItem('gymix_saved', JSON.stringify([...savedClubs]));
+  // Карточкадағы батырманы жаңарту (тізімді қайта render етпей)
+  const btn = document.querySelector(`#card-${id} .club-save-btn`);
+  if (btn) {
+    const isSaved = savedClubs.has(id);
+    btn.classList.toggle('saved', isSaved);
+    btn.title = isSaved ? 'Сақталған' : 'Сақтау';
+    const path = btn.querySelector('path');
+    if (path) {
+      path.setAttribute('fill', isSaved ? '#ff6b9d' : 'none');
+      path.setAttribute('stroke', isSaved ? '#ff6b9d' : 'currentColor');
+    }
+  }
+  updateSavedBadge();
+  if (showSavedOnly) applyFilters();
+}
+
+function toggleSavedFilter() {
+  showSavedOnly = !showSavedOnly;
+  const btn = document.getElementById('savedFilterBtn');
+  btn.style.borderColor    = showSavedOnly ? '#ff6b9d' : '';
+  btn.style.background     = showSavedOnly ? '#fff0f5' : '';
+  btn.style.color          = showSavedOnly ? '#ff6b9d' : '';
+  closeDetail();
+  applyFilters();
+}
+
+function updateSavedBadge() {
+  const badge = document.getElementById('savedBadge');
+  const n = savedClubs.size;
+  badge.textContent  = n;
+  badge.style.display = n > 0 ? 'flex' : 'none';
+  badge.style.background = '#ff6b9d';
+}
+
 // Удобствалар торын render ету (AMENITY_DATA-дан)
 function renderFilterAmenities() {
   const wrap = document.getElementById('filterAmenitiesWrap');
@@ -1889,6 +1958,7 @@ function checkSession() {
 }
 function logoutUser() { localStorage.removeItem('gymix_session'); location.reload(); }
 checkSession();
+updateSavedBadge();
 </script>
 </body>
 </html>
