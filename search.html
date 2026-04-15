@@ -462,6 +462,273 @@
       nav { display: none; }
       header { padding: 0 16px; }
     }
+
+    /* ── LOCATION NEAR ── */
+    .loc-bar {
+      display: flex; gap: 6px; margin-bottom: 8px;
+    }
+    .loc-toggle {
+      flex: 1; display: flex; align-items: center; justify-content: center; gap: 5px;
+      padding: 7px 8px; border-radius: 10px;
+      border: 1.5px solid #e0e0ea; background: white;
+      font-family: 'Noto Sans', sans-serif; font-size: 11.5px; font-weight: 600;
+      color: #555; cursor: pointer; transition: all 0.18s; white-space: nowrap;
+    }
+    .loc-toggle:hover { border-color: var(--purple); color: var(--purple); }
+    .loc-toggle.active { border-color: var(--purple); background: #f0eeff; color: var(--purple); }
+    .loc-toggle.set.home { border-color: #00b894; background: #e8fdf7; color: #00b894; }
+    .loc-toggle.set.work { border-color: #0984e3; background: #e8f4ff; color: #0984e3; }
+    .loc-panel {
+      background: #f8f8fc; border: 1.5px solid #e0e0ea;
+      border-radius: 12px; padding: 12px; margin-bottom: 8px;
+    }
+    .loc-panel-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 10px; font-size: 12.5px; font-weight: 700; color: var(--dark);
+    }
+    .loc-panel-close {
+      background: none; border: none; cursor: pointer; color: var(--gray);
+      font-size: 14px; padding: 2px 7px; border-radius: 6px; transition: all 0.2s;
+    }
+    .loc-panel-close:hover { background: #eee; color: var(--dark); }
+    .loc-addr-row { display: flex; gap: 6px; margin-bottom: 8px; }
+    .loc-addr-input {
+      flex: 1; padding: 8px 10px; border-radius: 8px;
+      border: 1.5px solid #e0e0ea; background: white;
+      font-family: 'Noto Sans', sans-serif; font-size: 12px;
+      outline: none; transition: border-color 0.2s;
+    }
+    .loc-addr-input:focus { border-color: var(--purple); }
+    .loc-addr-find {
+      padding: 8px 12px; border-radius: 8px; border: none;
+      background: var(--purple); color: white;
+      font-family: 'Noto Sans', sans-serif; font-size: 12px; font-weight: 700;
+      cursor: pointer; transition: all 0.2s; white-space: nowrap;
+    }
+    .loc-addr-find:hover { background: var(--purple-dark); }
+    .loc-addr-find:disabled { background: #c0b8f0; cursor: not-allowed; }
+    .loc-or {
+      text-align: center; font-size: 11px; color: var(--gray);
+      margin: 7px 0; position: relative;
+    }
+    .loc-or::before, .loc-or::after {
+      content: ''; position: absolute; top: 50%; width: 40%; height: 1px; background: #e0e0ea;
+    }
+    .loc-or::before { left: 0; } .loc-or::after { right: 0; }
+    .loc-pickmap-btn {
+      width: 100%; padding: 8px 10px; border-radius: 8px;
+      border: 1.5px dashed #c0c0d8; background: white;
+      font-family: 'Noto Sans', sans-serif; font-size: 12px; font-weight: 600;
+      color: #555; cursor: pointer; transition: all 0.2s;
+    }
+    .loc-pickmap-btn:hover { border-color: var(--purple); color: var(--purple); background: #f8f7ff; }
+    .loc-pick-hint {
+      margin-top: 8px; padding: 9px 11px; border-radius: 8px;
+      background: #fff8e1; border: 1px solid #ffd54f;
+      font-size: 11.5px; color: #7a6000; line-height: 1.5;
+    }
+    .loc-pick-ok {
+      display: block; width: 100%; margin-top: 7px; padding: 8px;
+      border-radius: 7px; border: none; background: #00b894; color: white;
+      font-family: 'Noto Sans', sans-serif; font-size: 12px; font-weight: 700;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .loc-pick-ok:hover { background: #00a882; }
+    .loc-geocode-status {
+      margin-top: 7px; font-size: 12px; text-align: center;
+      min-height: 18px; color: var(--gray);
+    }
+    .loc-suggest-wrap { position: relative; }
+    .loc-suggest-drop {
+      position: absolute; top: calc(100% + 2px); left: 0; right: 0; z-index: 600;
+      background: white; border: 1.5px solid #e0e0ea; border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.13);
+      max-height: 230px; overflow-y: auto; overflow-x: hidden;
+    }
+    .loc-suggest-drop::-webkit-scrollbar { width: 3px; }
+    .loc-suggest-drop::-webkit-scrollbar-thumb { background: #ddd; border-radius: 3px; }
+    .loc-suggest-item {
+      display: flex; align-items: flex-start; gap: 9px;
+      padding: 9px 11px; cursor: pointer;
+      border-bottom: 1px solid #f0f0f5; transition: background 0.13s;
+    }
+    .loc-suggest-item:last-child { border-bottom: none; }
+    .loc-suggest-item:hover, .loc-suggest-item.focused { background: #f4f5fb; }
+    .loc-suggest-pin {
+      width: 26px; height: 26px; border-radius: 8px; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--purple), var(--purple-light));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; margin-top: 1px;
+    }
+    .loc-suggest-texts { flex: 1; min-width: 0; }
+    .loc-suggest-name {
+      font-size: 12.5px; font-weight: 700; color: var(--dark);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .loc-suggest-sub {
+      font-size: 11px; color: var(--gray); margin-top: 1px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .loc-suggest-loading {
+      padding: 12px; text-align: center; font-size: 12px; color: var(--gray);
+    }
+    .loc-active-row {
+      display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px;
+    }
+    .loc-tag {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 4px 9px; border-radius: 20px;
+      font-size: 11px; font-weight: 600;
+    }
+    .loc-tag.home { background: #e8fdf7; color: #00b894; border: 1px solid #b2ebe0; }
+    .loc-tag.work { background: #e8f4ff; color: #0984e3; border: 1px solid #b2d8f8; }
+    .loc-tag button {
+      background: none; border: none; cursor: pointer;
+      font-size: 10px; color: inherit; opacity: 0.65; padding: 0 1px;
+    }
+    .loc-tag button:hover { opacity: 1; }
+    .dist-badges { display: flex; gap: 4px; margin-top: 3px; flex-wrap: wrap; }
+    .dist-badge {
+      display: inline-flex; align-items: center; gap: 3px;
+      font-size: 10.5px; font-weight: 700;
+      padding: 1px 6px; border-radius: 6px;
+    }
+    .dist-badge.home { background: #e8fdf7; color: #00b894; }
+    .dist-badge.work { background: #e8f4ff; color: #0984e3; }
+
+    /* ── FILTER OPEN BUTTON ── */
+    .search-filter-row { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+    .search-filter-row .search-wrap { flex: 1; margin-bottom: 0; }
+    .filter-open-btn {
+      position: relative; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      width: 40px; height: 38px; border-radius: 12px;
+      border: 1.5px solid #e0e0ea; background: white;
+      cursor: pointer; transition: all 0.2s; color: #555;
+    }
+    .filter-open-btn:hover { border-color: var(--purple); color: var(--purple); }
+    .filter-open-btn.has-filters { border-color: var(--purple); background: #f0eeff; color: var(--purple); }
+    .filter-badge {
+      position: absolute; top: -7px; right: -7px;
+      min-width: 18px; height: 18px; border-radius: 9px;
+      background: var(--purple); color: white;
+      font-size: 10px; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0 4px;
+    }
+
+    /* ── FILTER PANEL ── */
+    .filter-panel {
+      width: 0; flex-shrink: 0; overflow: hidden;
+      background: var(--white); border-right: 1px solid #ebebf0;
+      transition: width 0.3s ease;
+      display: flex; flex-direction: column; z-index: 9;
+    }
+    .filter-panel.open { width: 280px; }
+    .filter-inner {
+      width: 280px; height: 100%;
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+    .filter-panel-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 16px 12px; border-bottom: 1px solid #f0f0f5; flex-shrink: 0;
+    }
+    .filter-panel-title {
+      font-family: 'Montserrat', sans-serif; font-size: 15px; font-weight: 800; color: var(--dark);
+    }
+    .filter-panel-close {
+      width: 28px; height: 28px; border-radius: 50%;
+      border: 1.5px solid #e0e0ea; background: white; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; color: var(--gray); transition: all 0.2s;
+    }
+    .filter-panel-close:hover { border-color: var(--dark); color: var(--dark); }
+    .filter-body { flex: 1; overflow-y: auto; padding: 12px 14px 0; }
+    .filter-body::-webkit-scrollbar { width: 3px; }
+    .filter-body::-webkit-scrollbar-thumb { background: #ddd; border-radius: 3px; }
+    .filter-amenities-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+    .filter-panel-header { padding: 14px 14px 10px; }
+    .filter-section { margin-bottom: 20px; }
+    .filter-section-title {
+      font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 800;
+      color: var(--gray); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 9px;
+    }
+    .fcat-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 6px 8px; border-radius: 10px; cursor: pointer; transition: background 0.13s;
+    }
+    .fcat-row:hover { background: var(--off-white); }
+    .fcat-row.active { background: #f0eeff; }
+    .fcat-icon {
+      width: 34px; height: 34px; border-radius: 9px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px;
+    }
+    .fcat-label { flex: 1; font-size: 13px; font-weight: 600; color: var(--dark); }
+    .fcat-check {
+      width: 20px; height: 20px; border-radius: 6px; flex-shrink: 0;
+      border: 2px solid #d8d8e8; background: white;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s;
+    }
+    .fcat-row.active .fcat-check { background: var(--purple); border-color: var(--purple); }
+    .fcat-check-icon { display: none; width: 11px; height: 11px; color: white; }
+    .fcat-row.active .fcat-check-icon { display: block; }
+    .filter-women-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 11px 13px; border-radius: 12px;
+      border: 1.5px solid #e0e0ea; background: white; cursor: pointer; transition: all 0.15s;
+    }
+    .filter-women-row:hover { border-color: #fd79a8; }
+    .filter-women-row.active { border-color: #fd79a8; background: #fff0f7; }
+    .filter-women-left { display: flex; align-items: center; gap: 9px; }
+    .filter-women-texts {}
+    .filter-women-name { font-size: 13px; font-weight: 700; color: var(--dark); }
+    .filter-women-sub { font-size: 11px; color: var(--gray); margin-top: 1px; }
+    .filter-women-toggle {
+      width: 38px; height: 22px; border-radius: 11px; background: #e0e0ea;
+      position: relative; transition: background 0.2s; flex-shrink: 0;
+    }
+    .filter-women-toggle.on { background: #fd79a8; }
+    .filter-women-toggle::after {
+      content: ''; position: absolute; top: 3px; left: 3px;
+      width: 16px; height: 16px; border-radius: 50%; background: white;
+      transition: left 0.2s; box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+    .filter-women-toggle.on::after { left: 19px; }
+    .filter-amenities-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .famen-item {
+      display: flex; align-items: center; gap: 7px;
+      padding: 7px 9px; border-radius: 10px;
+      border: 1.5px solid #e0e0ea; background: white;
+      cursor: pointer; transition: all 0.15s;
+      font-size: 11.5px; font-weight: 600; color: #555;
+    }
+    .famen-item:hover { border-color: var(--purple); color: var(--purple); }
+    .famen-item.active { border-color: var(--purple); background: #f0eeff; color: var(--purple); }
+    .famen-item.active .famen-icon { background: var(--purple); }
+    .famen-item.active .famen-icon svg { color: white; }
+    .famen-icon {
+      width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0;
+      background: #f0f0f8; display: flex; align-items: center; justify-content: center; transition: background 0.15s;
+    }
+    .famen-icon svg { width: 14px; height: 14px; color: #888; transition: color 0.15s; }
+    .filter-footer {
+      display: flex; gap: 8px; padding: 12px 14px; border-top: 1px solid #f0f0f5; flex-shrink: 0;
+    }
+    .filter-clear-btn {
+      flex: 1; padding: 11px; border-radius: 12px; border: 1.5px solid #e0e0ea; background: white;
+      font-family: 'Noto Sans', sans-serif; font-size: 13px; font-weight: 700;
+      color: var(--gray); cursor: pointer; transition: all 0.2s;
+    }
+    .filter-clear-btn:hover { border-color: #ccc; color: var(--dark); }
+    .filter-apply-btn {
+      flex: 2; padding: 11px; border-radius: 12px; border: none; background: var(--purple);
+      font-family: 'Noto Sans', sans-serif; font-size: 13px; font-weight: 700;
+      color: white; cursor: pointer; transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(108,92,231,0.3);
+    }
+    .filter-apply-btn:hover { background: var(--purple-dark); }
   </style>
 </head>
 <body>
@@ -492,35 +759,96 @@
   <aside class="sidebar">
     <div class="sidebar-top">
       <div class="sidebar-title">Спорт залдарды іздеу</div>
-      <div class="search-wrap">
-        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
-        </svg>
-        <input class="search-input" id="searchInput" type="text" placeholder="Зал атауы немесе мекенжай...">
+      <div class="search-filter-row">
+        <div class="search-wrap">
+          <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+          </svg>
+          <input class="search-input" id="searchInput" type="text" placeholder="Зал атауы немесе мекенжай...">
+        </div>
+        <button class="filter-open-btn" id="filterOpenBtn" onclick="openFilterPanel()" title="Фильтрлер">
+          <svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+            <line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/>
+          </svg>
+          <span class="filter-badge" id="filterBadge" style="display:none">0</span>
+        </button>
       </div>
-      <div class="filters-row" id="filtersRow">
-        <button class="filter-chip active" data-cat="all"><span class="chip-icon">🏆</span> Барлығы</button>
-        <button class="filter-chip" data-cat="gym"><span class="chip-icon">💪</span> Спорт залы</button>
-        <button class="filter-chip" data-cat="fitness"><span class="chip-icon">🏋️</span> Фитнес</button>
-        <button class="filter-chip" data-cat="group"><span class="chip-icon">🎯</span> Топтық студия</button>
-        <button class="filter-chip" data-cat="swimming"><span class="chip-icon">🏊</span> Жүзу</button>
-        <button class="filter-chip" data-cat="yoga"><span class="chip-icon">🧘</span> Йога</button>
-        <button class="filter-chip" data-cat="stretching"><span class="chip-icon">🤸</span> Пилатес</button>
-        <button class="filter-chip" data-cat="intensive"><span class="chip-icon">⚡</span> Қарқынды</button>
-        <button class="filter-chip" data-cat="martial"><span class="chip-icon">🥊</span> Жекпе-жек</button>
-        <button class="filter-chip" data-cat="dance"><span class="chip-icon">💃</span> Би студиясы</button>
-        <button class="filter-chip" data-cat="bath"><span class="chip-icon">♨️</span> Монша / СПА</button>
-        <button class="filter-chip" data-cat="massage"><span class="chip-icon">💆</span> Массаж</button>
-        <button class="filter-chip" data-cat="archery"><span class="chip-icon">🏹</span> Садақ ату</button>
-        <button class="filter-chip" data-cat="analysis"><span class="chip-icon">🔬</span> Дене анализі</button>
-        <button class="filter-chip" data-cat="outdoor"><span class="chip-icon">⛸️</span> Ауадағы алаң</button>
-        <button class="filter-chip" data-cat="tabletennis"><span class="chip-icon">🏓</span> Үстел теннисі</button>
-        <button class="filter-chip" data-cat="equipment"><span class="chip-icon">🛒</span> Спорт дүкені</button>
+
+      <!-- ── ЖАК. МЕКЕНЖАЙ: ҮЙ / ЖҰМЫС ── -->
+      <div class="loc-bar">
+        <button class="loc-toggle home" id="btnLocHome" onclick="toggleLocPanel('home')">🏠 Үйден жақын</button>
+        <button class="loc-toggle work" id="btnLocWork" onclick="toggleLocPanel('work')">💼 Жұмыстан жақын</button>
       </div>
+      <div class="loc-panel" id="locPanel" style="display:none">
+        <div class="loc-panel-header">
+          <span id="locPanelTitle">🏠 Үй мекенжайы</span>
+          <button class="loc-panel-close" onclick="closeLocPanel()">✕</button>
+        </div>
+        <div class="loc-suggest-wrap">
+          <div class="loc-addr-row">
+            <input class="loc-addr-input" id="locAddrInput" type="text" placeholder="Мекенжайды жазыңыз..." autocomplete="off">
+            <button class="loc-addr-find" id="locAddrFindBtn" onclick="geocodeLoc()">Табу</button>
+          </div>
+          <div class="loc-suggest-drop" id="locSuggestDrop" style="display:none"></div>
+        </div>
+        <div class="loc-or">немесе</div>
+        <button class="loc-pickmap-btn" id="locPickmapBtn" onclick="startPickFromMap()">📍 Картадан нүкте таңда</button>
+        <div class="loc-pick-hint" id="locPickHint" style="display:none">
+          Картаға басыңыз немесе маркерді сүйреңіз
+          <button class="loc-pick-ok" onclick="confirmLocPick()">✓ Растау</button>
+        </div>
+        <div class="loc-geocode-status" id="locGeocodeStatus"></div>
+      </div>
+      <div class="loc-active-row" id="locActiveRow" style="display:none"></div>
+
       <div class="results-count" id="resultsCount">Жүктелуде...</div>
     </div>
     <div class="clubs-list" id="clubsList"></div>
   </aside>
+
+  <!-- ── FILTER PANEL (detail-panel сияқты жеке баған) ── -->
+  <div class="filter-panel" id="filterPanel">
+    <div class="filter-inner">
+      <div class="filter-panel-header">
+        <span class="filter-panel-title">Фильтрлер</span>
+        <button class="filter-panel-close" onclick="closeFilterPanel()">✕</button>
+      </div>
+      <div class="filter-body">
+
+        <!-- Категориялар -->
+        <div class="filter-section">
+          <div class="filter-section-title">Категориялар</div>
+          <div id="filterCatsList"></div>
+        </div>
+
+        <!-- Арнайы -->
+        <div class="filter-section">
+          <div class="filter-section-title">Арнайы</div>
+          <div class="filter-women-row" id="filterWomenRow" onclick="toggleWomen()">
+            <div class="filter-women-left">
+              <span style="font-size:22px;line-height:1">👩</span>
+              <div class="filter-women-texts">
+                <div class="filter-women-name">Әйелдерге арналған</div>
+                <div class="filter-women-sub">Тек қыздарға арналған залдар</div>
+              </div>
+            </div>
+            <div class="filter-women-toggle" id="filterWomenToggle"></div>
+          </div>
+        </div>
+
+        <!-- Удобствалар -->
+        <div class="filter-section">
+          <div class="filter-section-title">Удобствалар</div>
+          <div class="filter-amenities-wrap" id="filterAmenitiesWrap"></div>
+        </div>
+
+      </div>
+      <div class="filter-footer">
+        <button class="filter-clear-btn" onclick="clearFilterPanel()">Тазалау</button>
+        <button class="filter-apply-btn" onclick="applyFilterPanel()">Қолдану</button>
+      </div>
+    </div>
+  </div>
 
   <!-- DETAIL PANEL -->
   <div class="detail-panel" id="detailPanel">
@@ -622,7 +950,9 @@ function makeSvgUrl(cat, highlighted) {
 // ══════════════════════════════════════════
 // СТАН
 // ══════════════════════════════════════════
-let activeCategory = 'all';
+let activeCats = new Set();      // filter panel categories (empty = барлығы)
+let activeAmenities = new Set(); // filter panel amenities
+let womenOnly = false;           // filter panel women toggle
 let searchQuery = '';
 let markerObjs = {};
 let activePopup = null;
@@ -632,6 +962,14 @@ let activeDetailId = null;
 // Mini map
 let miniMap = null;
 let miniMarker = null;
+
+// Жақын зал — үй/жұмыс нүктелері
+let locPts  = { home: null, work: null };
+let locMrks = { home: null, work: null };
+let locPickType    = null;
+let locPickCoords  = null;
+let locPickDragMrk = null;
+let locMapListening = false;
 
 // ══════════════════════════════════════════
 // УДОБСТВА ИКОНКАЛАРЫ (inline SVG)
@@ -927,12 +1265,32 @@ function toggleDesc() {
 // ══════════════════════════════════════════
 // ФИЛЬТР + ІЗДЕУ
 // ══════════════════════════════════════════
+const LOC_RADIUS_KM = 1;
+
 function getFiltered() {
   return CLUBS.filter(c => {
-    const matchCat = activeCategory === 'all' || c.cat === activeCategory;
+    // Категория
+    if (activeCats.size > 0 && !activeCats.has(c.cat)) return false;
+    // Іздеу
     const q = searchQuery.toLowerCase();
-    const matchSearch = !q || c.name.toLowerCase().includes(q) || (c.address || '').toLowerCase().includes(q);
-    return matchCat && matchSearch;
+    if (q && !c.name.toLowerCase().includes(q) && !(c.address || '').toLowerCase().includes(q)) return false;
+    // Әйелдерге арналған (filter panel)
+    if (womenOnly) {
+      const txt = ((c.name || '') + ' ' + (c.description || '')).toLowerCase();
+      if (!/женск|ladies|lady|women|woman|girls|қыздар|қыз|арналған/i.test(txt)) return false;
+    }
+    // Удобствалар (filter panel)
+    if (activeAmenities.size > 0) {
+      const has = new Set(c.amenities || []);
+      for (const a of activeAmenities) { if (!has.has(a)) return false; }
+    }
+    // Мекенжай 1 км радиусы
+    if (locPts.home || locPts.work) {
+      const inHome = locPts.home && haversineKm(locPts.home.lat, locPts.home.lng, c.lat, c.lng) <= LOC_RADIUS_KM;
+      const inWork = locPts.work && haversineKm(locPts.work.lat, locPts.work.lng, c.lat, c.lng) <= LOC_RADIUS_KM;
+      return !!(inHome || inWork);
+    }
+    return true;
   });
 }
 
@@ -940,7 +1298,20 @@ function renderList() {
   const filtered = getFiltered();
   const list = document.getElementById('clubsList');
   const count = document.getElementById('resultsCount');
-  count.textContent = filtered.length + ' зал табылды';
+
+  const hasLoc = locPts.home || locPts.work;
+
+  // Қашықтық бойынша сорттау (мекенжай белгіленсе)
+  if (hasLoc) {
+    filtered.sort((a, b) => {
+      const da = getClubMinDist(a);
+      const db = getClubMinDist(b);
+      return (da === null ? 999 : da) - (db === null ? 999 : db);
+    });
+    count.textContent = filtered.length + ' зал — 1 км радиуста';
+  } else {
+    count.textContent = filtered.length + ' зал табылды';
+  }
 
   if (filtered.length === 0) {
     list.innerHTML = `<div class="no-results">
@@ -956,6 +1327,22 @@ function renderList() {
       ? `<img class="club-thumb" src="${club.img}" alt="${club.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
       : '';
     const placeholder = `<div class="club-thumb-placeholder" ${club.img ? 'style="display:none"' : ''}>${club.catIcon}</div>`;
+
+    // Қашықтық белгілері
+    let distHtml = '';
+    if (hasLoc) {
+      const badges = [];
+      if (locPts.home) {
+        const d = haversineKm(locPts.home.lat, locPts.home.lng, club.lat, club.lng);
+        badges.push(`<span class="dist-badge home">🏠 ${fmtDist(d)}</span>`);
+      }
+      if (locPts.work) {
+        const d = haversineKm(locPts.work.lat, locPts.work.lng, club.lat, club.lng);
+        badges.push(`<span class="dist-badge work">💼 ${fmtDist(d)}</span>`);
+      }
+      if (badges.length) distHtml = `<div class="dist-badges">${badges.join('')}</div>`;
+    }
+
     return `
       <div class="club-card${activeDetailId === club.id ? ' active-detail' : ''}" id="card-${club.id}" onclick="focusClub(${club.id})">
         ${thumb}${placeholder}
@@ -964,6 +1351,7 @@ function renderList() {
           <div class="club-cat">${club.catIcon} ${club.catLabel}</div>
           <div class="club-address">📍 ${club.address || 'Астана'}</div>
           <div class="club-rating">★ <span style="color:#666;font-weight:400;font-size:11px">${club.rating}</span></div>
+          ${distHtml}
         </div>
       </div>`;
   }).join('');
@@ -1020,34 +1408,461 @@ function highlightCard(id) {
 // ══════════════════════════════════════════
 // ОҚИҒАЛАР
 // ══════════════════════════════════════════
-document.getElementById('filtersRow').addEventListener('click', e => {
-  const chip = e.target.closest('.filter-chip');
-  if (!chip) return;
-  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-  chip.classList.add('active');
-  activeCategory = chip.dataset.cat;
-  closeDetail();
-  applyFilters();
-});
-
 document.getElementById('searchInput').addEventListener('input', e => {
   searchQuery = e.target.value;
   applyFilters();
 });
 
-// URL param
+// URL param: ?cat=gym → filter panel-де белгілеу
 (function() {
   const params = new URLSearchParams(window.location.search);
   const cat = params.get('cat');
-  if (cat) {
-    activeCategory = cat;
-    document.querySelectorAll('.filter-chip').forEach(c => {
-      c.classList.toggle('active', c.dataset.cat === cat);
-    });
+  if (cat && cat !== 'all') {
+    activeCats.add(cat);
+    setTimeout(updateFilterBadge, 0);
   }
 })();
 
 applyFilters();
+
+// ══════════════════════════════════════════
+// ЖАҚЫН ЗАЛ — ҮЙ / ЖҰМЫС МЕКЕНЖАЙЫ
+// ══════════════════════════════════════════
+// Маркер суреті (SVG) — үй жасыл, жұмыс көк
+function makeLocSvg(type) {
+  const c = type === 'home' ? '#00b894' : '#0984e3';
+  const sym = type === 'home' ? '⌂' : '✦';
+  const svg = `<svg width="42" height="42" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="21" cy="18" r="15" fill="${c}" stroke="white" stroke-width="2.5"/>
+    <polygon points="21,40 13,28 29,28" fill="${c}"/>
+    <text x="21" y="24" text-anchor="middle" font-size="15" fill="white" font-weight="bold">${sym}</text>
+  </svg>`;
+  return 'data:image/svg+xml,' + encodeURIComponent(svg);
+}
+
+// ══════════════════════════════════════════
+// FILTER PANEL
+// ══════════════════════════════════════════
+const CAT_LIST = [
+  { key:'gym',         icon:'💪', kk:'Спорт залы' },
+  { key:'fitness',     icon:'🏋️', kk:'Фитнес' },
+  { key:'group',       icon:'🎯', kk:'Топтық студия' },
+  { key:'swimming',    icon:'🏊', kk:'Жүзу' },
+  { key:'yoga',        icon:'🧘', kk:'Йога' },
+  { key:'stretching',  icon:'🤸', kk:'Пилатес' },
+  { key:'intensive',   icon:'⚡', kk:'Қарқынды' },
+  { key:'martial',     icon:'🥊', kk:'Жекпе-жек' },
+  { key:'dance',       icon:'💃', kk:'Би студиясы' },
+  { key:'bath',        icon:'♨️', kk:'Монша / СПА' },
+  { key:'massage',     icon:'💆', kk:'Массаж' },
+  { key:'archery',     icon:'🏹', kk:'Садақ ату' },
+  { key:'analysis',    icon:'🔬', kk:'Дене анализі' },
+  { key:'equipment',   icon:'🛒', kk:'Спорт дүкені' },
+  { key:'outdoor',     icon:'⛸️', kk:'Ауадағы алаң' },
+  { key:'tabletennis', icon:'🏓', kk:'Үстел теннисі' },
+];
+
+const CHECK_SVG = `<svg class="fcat-check-icon" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg>`;
+
+function renderFilterCategories() {
+  const el = document.getElementById('filterCatsList');
+  if (!el || el.children.length) return;
+  el.innerHTML = CAT_LIST.map(c => {
+    const col = CAT_COLORS[c.key] || '#6C5CE7';
+    const active = activeCats.has(c.key) ? ' active' : '';
+    return `<div class="fcat-row${active}" data-cat="${c.key}" onclick="toggleFCat('${c.key}')">
+      <div class="fcat-icon" style="background:${col}22">${c.icon}</div>
+      <span class="fcat-label">${c.kk}</span>
+      <div class="fcat-check">${CHECK_SVG}</div>
+    </div>`;
+  }).join('');
+}
+
+function toggleFCat(cat) {
+  if (activeCats.has(cat)) activeCats.delete(cat);
+  else activeCats.add(cat);
+  const el = document.querySelector(`.fcat-row[data-cat="${cat}"]`);
+  if (el) el.classList.toggle('active', activeCats.has(cat));
+}
+
+function openFilterPanel() {
+  const fp = document.getElementById('filterPanel');
+  if (fp.classList.contains('open')) { closeFilterPanel(); return; }
+  // Detail панель ашық болса жабу
+  closeDetail();
+  fp.classList.add('open');
+  document.getElementById('filterOpenBtn').classList.add('has-filters');
+  renderFilterCategories();
+  renderFilterAmenities();
+}
+function closeFilterPanel() {
+  document.getElementById('filterPanel').classList.remove('open');
+  if (activeCats.size === 0 && activeAmenities.size === 0 && !womenOnly) {
+    document.getElementById('filterOpenBtn').classList.remove('has-filters');
+  }
+}
+function toggleWomen() {
+  womenOnly = !womenOnly;
+  document.getElementById('filterWomenRow').classList.toggle('active', womenOnly);
+  document.getElementById('filterWomenToggle').classList.toggle('on', womenOnly);
+}
+function toggleFAmen(key) {
+  if (activeAmenities.has(key)) activeAmenities.delete(key);
+  else activeAmenities.add(key);
+  const el = document.querySelector(`.famen-item[data-amen="${key}"]`);
+  if (el) el.classList.toggle('active', activeAmenities.has(key));
+}
+function clearFilterPanel() {
+  activeCats.clear();
+  activeAmenities.clear();
+  womenOnly = false;
+  document.querySelectorAll('.fcat-row').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.famen-item').forEach(el => el.classList.remove('active'));
+  document.getElementById('filterWomenRow').classList.remove('active');
+  document.getElementById('filterWomenToggle').classList.remove('on');
+  updateFilterBadge();
+}
+function applyFilterPanel() {
+  closeFilterPanel();
+  closeDetail();
+  updateFilterBadge();
+  applyFilters();
+}
+function updateFilterBadge() {
+  const count = activeCats.size + activeAmenities.size + (womenOnly ? 1 : 0);
+  const badge = document.getElementById('filterBadge');
+  const btn   = document.getElementById('filterOpenBtn');
+  if (count > 0) {
+    badge.textContent = count;
+    badge.style.display = 'flex';
+    btn.classList.add('has-filters');
+  } else {
+    badge.style.display = 'none';
+    btn.classList.remove('has-filters');
+  }
+}
+// Удобствалар торын render ету (AMENITY_DATA-дан)
+function renderFilterAmenities() {
+  const wrap = document.getElementById('filterAmenitiesWrap');
+  if (!wrap || wrap.children.length > 0) return; // бір рет ғана
+  wrap.innerHTML = Object.entries(AMENITY_DATA).map(([key, d]) =>
+    `<div class="famen-item${activeAmenities.has(key) ? ' active' : ''}" data-amen="${key}" onclick="toggleFAmen('${key}')">
+      <div class="famen-icon">${d.svg}</div>
+      <span>${d.kk}</span>
+    </div>`
+  ).join('');
+}
+
+// ── АВТОТОЛТЫРУ (Suggest) ──
+let _suggestTimer = null;
+let _suggestFocusIdx = -1;
+
+function initLocInput() {
+  const input = document.getElementById('locAddrInput');
+  if (!input) return;
+
+  input.addEventListener('input', () => {
+    clearTimeout(_suggestTimer);
+    const q = input.value.trim();
+    if (q.length < 2) { hideSuggest(); return; }
+    showSuggestLoading();
+    _suggestTimer = setTimeout(() => fetchSuggest(q), 320);
+  });
+
+  input.addEventListener('keydown', (e) => {
+    const drop = document.getElementById('locSuggestDrop');
+    if (drop.style.display === 'none') {
+      if (e.key === 'Enter') geocodeLoc();
+      return;
+    }
+    const items = drop.querySelectorAll('.loc-suggest-item');
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      _suggestFocusIdx = Math.min(_suggestFocusIdx + 1, items.length - 1);
+      updateSuggestFocus(items);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      _suggestFocusIdx = Math.max(_suggestFocusIdx - 1, 0);
+      updateSuggestFocus(items);
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (_suggestFocusIdx >= 0 && items[_suggestFocusIdx]) {
+        items[_suggestFocusIdx].click();
+      } else {
+        geocodeLoc();
+      }
+    } else if (e.key === 'Escape') {
+      hideSuggest();
+    }
+  });
+
+  // Dropdown сыртына бассаң жабылады
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.loc-suggest-wrap')) hideSuggest();
+  });
+}
+
+function updateSuggestFocus(items) {
+  items.forEach((el, i) => el.classList.toggle('focused', i === _suggestFocusIdx));
+}
+
+function showSuggestLoading() {
+  const drop = document.getElementById('locSuggestDrop');
+  drop.innerHTML = '<div class="loc-suggest-loading">Іздеу...</div>';
+  drop.style.display = 'block';
+}
+
+function hideSuggest() {
+  const drop = document.getElementById('locSuggestDrop');
+  if (drop) { drop.style.display = 'none'; drop.innerHTML = ''; }
+  _suggestFocusIdx = -1;
+}
+
+async function fetchSuggest(q) {
+  try {
+    // Астана орталығынан 25 км радиуста іздеу
+    const url = `https://catalog.api.2gis.com/3.0/items?q=${encodeURIComponent(q)}&key=${YOUR_2GIS_KEY}&fields=items.point,items.full_name,items.address&type=street,building,attraction&page_size=7&locale=ru_KZ&location=71.4344,51.1294&radius=25000`;
+    const res = await fetch(url);
+    if (!res.ok) { hideSuggest(); return; }
+    const data = await res.json();
+    const items = (data.result?.items || []).filter(i => i.point?.lat && i.point?.lon);
+    renderSuggest(items, q);
+  } catch (e) {
+    hideSuggest();
+  }
+}
+
+function renderSuggest(items, q) {
+  const drop = document.getElementById('locSuggestDrop');
+  if (!items.length) { hideSuggest(); return; }
+  _suggestFocusIdx = -1;
+
+  // Іздеу сөзін bold ету
+  function highlight(text) {
+    if (!text) return '';
+    const re = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    return text.replace(re, '<strong>$1</strong>');
+  }
+
+  drop.innerHTML = items.map(item => {
+    const lat = item.point?.lat;
+    const lng = item.point?.lon;
+    if (!lat || !lng) return '';
+
+    const name = item.name || '';
+    const addr = item.full_name || item.address?.name || '';
+    const sub  = addr !== name ? addr : '';
+    const safeN = name.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+
+    return `<div class="loc-suggest-item" onclick="selectSuggest(${lat},${lng},'${safeN}')">
+      <div class="loc-suggest-pin">📍</div>
+      <div class="loc-suggest-texts">
+        <div class="loc-suggest-name">${highlight(name)}</div>
+        ${sub ? `<div class="loc-suggest-sub">${sub}</div>` : ''}
+      </div>
+    </div>`;
+  }).filter(Boolean).join('');
+
+  if (drop.innerHTML) drop.style.display = 'block';
+  else hideSuggest();
+}
+
+function selectSuggest(lat, lng, name) {
+  document.getElementById('locAddrInput').value = name;
+  hideSuggest();
+  if (locPickType) {
+    setLocPoint(locPickType, lat, lng, name);
+    document.getElementById('locGeocodeStatus').textContent = '✓ Нүкте белгіленді!';
+    setTimeout(() => closeLocPanel(), 800);
+  }
+}
+
+// Панельді ашу/жабу
+function toggleLocPanel(type) {
+  const panel = document.getElementById('locPanel');
+  if (locPickType === type && panel.style.display !== 'none') {
+    closeLocPanel(); return;
+  }
+  locPickType = type;
+  document.getElementById('locPanelTitle').textContent = type === 'home' ? '🏠 Үй мекенжайы' : '💼 Жұмыс орны мекенжайы';
+  document.getElementById('locAddrInput').value = locPts[type]?.label || '';
+  document.getElementById('locGeocodeStatus').textContent = '';
+  document.getElementById('locPickHint').style.display = 'none';
+  document.getElementById('locPickmapBtn').style.display = '';
+  panel.style.display = 'block';
+  document.getElementById('btnLocHome').classList.toggle('active', type === 'home');
+  document.getElementById('btnLocWork').classList.toggle('active', type === 'work');
+  // Input-ты фокусқа алу + autocomplete инициализациясы
+  setTimeout(() => {
+    const inp = document.getElementById('locAddrInput');
+    if (inp) inp.focus();
+  }, 50);
+  if (!window._locInputInited) {
+    window._locInputInited = true;
+    initLocInput();
+  }
+}
+
+function closeLocPanel() {
+  document.getElementById('locPanel').style.display = 'none';
+  hideSuggest();
+  stopPickFromMap();
+  locPickType = null;
+  document.getElementById('btnLocHome').classList.remove('active');
+  document.getElementById('btnLocWork').classList.remove('active');
+}
+
+// Мекенжайды 2GIS арқылы геокодтау
+async function geocodeLoc() {
+  const q = document.getElementById('locAddrInput').value.trim();
+  if (!q || !locPickType) return;
+  const st = document.getElementById('locGeocodeStatus');
+  const btn = document.getElementById('locAddrFindBtn');
+  st.textContent = 'Іздеу...';
+  btn.disabled = true;
+  try {
+    const url = `https://catalog.api.2gis.com/3.0/items/geocode?q=${encodeURIComponent('Астана ' + q)}&fields=items.point&key=${YOUR_2GIS_KEY}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data.result?.items?.length > 0) {
+      const pt = data.result.items[0].point;
+      setLocPoint(locPickType, pt.lat, pt.lon, q);
+      st.textContent = '✓ Нүкте белгіленді!';
+      setTimeout(() => closeLocPanel(), 900);
+    } else {
+      st.textContent = '❌ Мекенжай табылмады';
+    }
+  } catch (e) {
+    st.textContent = '❌ Желі қатесі';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// Картадан нүкте таңдау режимі
+function startPickFromMap() {
+  document.getElementById('locPickHint').style.display = 'block';
+  document.getElementById('locPickmapBtn').style.display = 'none';
+  document.getElementById('locGeocodeStatus').textContent = 'Маркерді жылжытып немесе картаға басыңыз';
+
+  // Картаның ортасына сүйреп апаратын маркер қою
+  const center = map.getCenter();
+  locPickCoords = center;
+  if (locPickDragMrk) { try { locPickDragMrk.destroy(); } catch(e) {} }
+  try {
+    locPickDragMrk = new mapgl.Marker(map, {
+      coordinates: center,
+      draggable: true,
+      icon: makeLocSvg(locPickType),
+      size: [42, 42],
+      anchor: [0.5, 1],
+      zIndex: 200
+    });
+    locPickDragMrk.on('dragend', (coords) => {
+      if (Array.isArray(coords)) locPickCoords = coords;
+      else if (coords?.lngLat) locPickCoords = coords.lngLat;
+    });
+  } catch(e) {}
+
+  // Картаға басу арқылы нүкте қою
+  locMapListening = true;
+  map._locClickHandler = (e) => {
+    if (!locMapListening) return;
+    const coords = e.lngLat;
+    if (!coords) return;
+    locPickCoords = coords;
+    if (locPickDragMrk) {
+      try { locPickDragMrk.setCoordinates(coords); } catch(e) {}
+    }
+  };
+  map.on('click', map._locClickHandler);
+}
+
+function stopPickFromMap() {
+  locMapListening = false;
+  if (map._locClickHandler) {
+    map.off('click', map._locClickHandler);
+    map._locClickHandler = null;
+  }
+  if (locPickDragMrk) {
+    try { locPickDragMrk.destroy(); } catch(e) {}
+    locPickDragMrk = null;
+  }
+  locPickCoords = null;
+}
+
+// "Растау" батырмасы — таңдалған нүктені сақтау
+function confirmLocPick() {
+  if (!locPickCoords || !locPickType) return;
+  const [lng, lat] = locPickCoords;
+  setLocPoint(locPickType, lat, lng, null);
+  closeLocPanel();
+}
+
+// Нүктені сақтау + маркер қою
+function setLocPoint(type, lat, lng, label) {
+  locPts[type] = { lat, lng, label };
+  if (locMrks[type]) { try { locMrks[type].destroy(); } catch(e) {} }
+  try {
+    locMrks[type] = new mapgl.Marker(map, {
+      coordinates: [lng, lat],
+      icon: makeLocSvg(type),
+      size: [42, 42],
+      anchor: [0.5, 1],
+      zIndex: 150
+    });
+  } catch(e) {}
+  document.getElementById('btnLoc' + (type === 'home' ? 'Home' : 'Work')).classList.add('set');
+  updateLocActiveRow();
+  applyFilters();
+}
+
+// Нүктені жою
+function clearLocPoint(type) {
+  locPts[type] = null;
+  if (locMrks[type]) { try { locMrks[type].destroy(); } catch(e) {} locMrks[type] = null; }
+  document.getElementById('btnLoc' + (type === 'home' ? 'Home' : 'Work')).classList.remove('set');
+  updateLocActiveRow();
+  applyFilters();
+}
+
+// Белсенді мекенжай тегтерін жаңарту
+function updateLocActiveRow() {
+  const row = document.getElementById('locActiveRow');
+  const items = [];
+  if (locPts.home) items.push(`<span class="loc-tag home">🏠 Үй белгіленді <button onclick="clearLocPoint('home')">✕</button></span>`);
+  if (locPts.work) items.push(`<span class="loc-tag work">💼 Жұмыс белгіленді <button onclick="clearLocPoint('work')">✕</button></span>`);
+  row.style.display = items.length ? 'flex' : 'none';
+  row.innerHTML = items.join('');
+}
+
+// Haversine формуласы — км
+function haversineKm(lat1, lng1, lat2, lng2) {
+  const R = 6371, r = Math.PI / 180;
+  const dLat = (lat2 - lat1) * r;
+  const dLng = (lng2 - lng1) * r;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*r)*Math.cos(lat2*r)*Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+// Залдың ең жақын мекенжайға қашықтығы (сорттау үшін)
+function getClubMinDist(club) {
+  const dHome = locPts.home ? haversineKm(locPts.home.lat, locPts.home.lng, club.lat, club.lng) : null;
+  const dWork = locPts.work ? haversineKm(locPts.work.lat, locPts.work.lng, club.lat, club.lng) : null;
+  if (dHome !== null && dWork !== null) return Math.min(dHome, dWork);
+  return dHome ?? dWork;
+}
+
+// Қашықтықты оқуға ыңғайлы форматқа түрлендіру
+function fmtDist(km) {
+  return km < 1 ? Math.round(km * 1000) + ' м' : km.toFixed(1) + ' км';
+}
+
+// Enter пернесімен геокодтау
+document.addEventListener('DOMContentLoaded', () => {
+  const input = document.getElementById('locAddrInput');
+  if (input) input.addEventListener('keydown', e => { if (e.key === 'Enter') geocodeLoc(); });
+});
 
 // ══════════════════════════════════════════
 // СЕССИЯ
